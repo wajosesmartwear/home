@@ -1,395 +1,302 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-100">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - Wajose Smart Wear</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Wajose Smart Wear | Executive Admin Portal</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
                     colors: {
                         brand: {
-                            50: '#fff1f2',
-                            100: '#ffe4e6',
-                            500: '#e11d48',
-                            600: '#e11d48',
-                            700: '#be123c',
-                            800: '#9f1239',
-                            900: '#881337',
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#035482',
+                            900: '#0c2a4a',
+                            gold: '#d97706',
+                            emerald: '#059669'
                         }
                     }
                 }
             }
         }
     </script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for Dashboards -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="h-full text-slate-800 antialiased font-sans">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <!-- TOP TOAST NOTIFICATION CONTAINER -->
-    <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-md px-4 pointer-events-none"></div>
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-[99999] w-11/12 max-w-lg pointer-events-none flex flex-col gap-2"></div>
 
-    <!-- LOGIN LOCK SCREEN -->
-    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-95 backdrop-blur-md">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border border-slate-100 text-center">
-            <div class="w-16 h-16 bg-rose-100 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
-                <i class="fa-solid fa-shield-halved"></i>
+    <!-- =================================================================== -->
+    <!-- LOGIN SCREEN OVERLAY -->
+    <!-- =================================================================== -->
+    <div id="loginOverlay" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-900 to-brand-600 mx-auto flex items-center justify-center border border-white/20 shadow-lg">
+                <i class="fa-solid fa-lock text-2xl text-white"></i>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-1">Wajose Admin Portal</h2>
-            <p class="text-sm text-slate-500 mb-6">Enter your master passcode to manage applicants and real-time cloud settings.</p>
-            
-            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+            <div class="space-y-2">
+                <h1 class="text-2xl font-black text-white">Wajose Admin Gateway</h1>
+                <p class="text-xs text-slate-400">Enter dynamic administrative password secured on Firebase cloud (Default: 115800).</p>
+            </div>
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
                 <div>
-                    <input type="password" id="pin-input" placeholder="Enter PIN (Default: 115800)" maxlength="12" required 
-                           class="w-full text-center text-2xl tracking-widest px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-600 focus:outline-none font-mono">
+                    <input type="password" id="adminPasswordInput" required placeholder="Enter 6-digit PIN..." 
+                           class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-center text-lg tracking-widest outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
-                <button type="submit" id="login-btn" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-rose-600/30 transition-all flex items-center justify-center gap-2">
-                    <span>Unlock Dashboard</span>
-                    <i class="fa-solid fa-arrow-right text-sm"></i>
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-sm shadow-xl transition">
+                    Authenticate & Access Dashboard
                 </button>
             </form>
-            <p class="text-xs text-slate-400 mt-6">Default PIN: <span class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600">115800</span></p>
+            <div class="text-[11px] text-slate-500 pt-2 border-t border-slate-800 flex justify-between items-center">
+                <span>Secure Cloud Node</span>
+                <span id="syncStatusBadge" class="text-amber-400 font-bold"><i class="fa-solid fa-circle text-[8px] animate-pulse"></i> Connecting Firestore...</span>
+            </div>
         </div>
     </div>
 
-    <!-- MAIN ADMIN INTERFACE -->
-    <div id="admin-app" class="hidden min-h-full flex flex-col">
+    <!-- =================================================================== -->
+    <!-- MAIN ADMIN DASHBOARD (HIDDEN UNTIL AUTHENTICATED) -->
+    <!-- =================================================================== -->
+    <div id="adminDashboard" class="hidden flex-col min-h-screen">
+        
         <!-- TOP NAVIGATION BAR -->
-        <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <div class="bg-brand-600 text-white w-9 h-9 rounded-lg flex items-center justify-center font-bold text-lg shadow-md shadow-brand-600/40">
-                        W
-                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center font-bold text-white text-lg">W</div>
                     <div>
-                        <h1 class="font-bold text-base tracking-wide text-white leading-tight">Wajose Smart Wear</h1>
-                        <p class="text-xs text-slate-400 flex items-center gap-1">
-                            <span id="connection-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                            <span id="connection-text">Connecting to Firebase...</span>
-                        </p>
+                        <h2 class="text-base font-black text-white tracking-tight">Wajose Admin Portal</h2>
+                        <span class="text-[10px] text-emerald-400 font-extrabold uppercase tracking-widest"><i class="fa-solid fa-circle-dot text-[8px] mr-1"></i> Real-time Sync Active</span>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <button onclick="refreshData()" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-rotate"></i>
-                        <span class="hidden sm:inline">Sync Data</span>
+                    <button onclick="switchAdminTab('applications')" id="nav-applications" class="admin-nav-btn px-4 py-2 rounded-xl text-xs font-bold bg-brand-600 text-white transition">
+                        <i class="fa-solid fa-users mr-1.5"></i> Applicants
                     </button>
-                    <button onclick="lockPortal()" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-lock text-xs"></i>
-                        <span>Lock</span>
+                    <button onclick="switchAdminTab('settings')" id="nav-settings" class="admin-nav-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-gear mr-1.5"></i> Payment & Settings
+                    </button>
+                    <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 font-bold text-xs transition">
+                        <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- SUB-NAVIGATION TABS -->
-        <div class="bg-white border-b border-slate-200 shadow-sm sticky top-16 z-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <nav class="flex gap-6 overflow-x-auto text-sm font-medium text-slate-600 no-scrollbar">
-                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-3.5 border-b-2 border-brand-600 text-brand-600 font-semibold flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-chart-pie"></i> Overview & Analytics
-                    </button>
-                    <button onclick="switchTab('applicants')" id="tab-applicants" class="py-3.5 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-users"></i> Applicant Records
-                        <span id="badge-applicant-count" class="bg-slate-100 text-slate-600 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
-                    </button>
-                    <button onclick="switchTab('settings')" id="tab-settings" class="py-3.5 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-sliders"></i> Payment & Cloud Settings
-                    </button>
-                </nav>
-            </div>
-        </div>
-
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-
-            <!-- TAB 1: DASHBOARD & ANALYTICS -->
-            <section id="view-dashboard" class="space-y-8">
+        <!-- CONTENT AREA -->
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            
+            <!-- ======================================================= -->
+            <!-- TAB 1: APPLICANTS & ANALYTICS DASHBOARD -->
+            <!-- ======================================================= -->
+            <div id="tabContent-applications" class="space-y-8">
+                
+                <!-- ANALYTICS STATS CARDS -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Applications</p>
-                            <h3 id="stat-total" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                            <p class="text-xs text-slate-500 mt-1">Live from cloud database</p>
-                        </div>
-                        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-folder-open"></i>
+                    <div class="p-6 rounded-3xl bg-slate-800/80 border border-slate-700 shadow-sm space-y-2">
+                        <span class="text-xs font-extrabold text-slate-400 uppercase">Total Applications</span>
+                        <div class="flex items-baseline justify-between">
+                            <h3 id="statTotal" class="text-3xl font-black text-white">0</h3>
+                            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-full"><i class="fa-solid fa-arrow-trend-up"></i> Live</span>
                         </div>
                     </div>
-
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Pending Review</p>
-                            <h3 id="stat-pending" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                            <p class="text-xs text-amber-600 font-medium mt-1">Awaiting evaluation</p>
-                        </div>
-                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-hourglass-half"></i>
+                    <div class="p-6 rounded-3xl bg-slate-800/80 border border-slate-700 shadow-sm space-y-2">
+                        <span class="text-xs font-extrabold text-slate-400 uppercase">Kericho New Branch</span>
+                        <div class="flex items-baseline justify-between">
+                            <h3 id="statKericho" class="text-3xl font-black text-amber-400">0</h3>
+                            <span class="text-xs font-bold text-amber-400 bg-amber-500/20 px-2.5 py-1 rounded-full">42+ Target</span>
                         </div>
                     </div>
-
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Shortlisted / Hired</p>
-                            <h3 id="stat-shortlisted" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                            <p class="text-xs text-emerald-600 font-medium mt-1">Approved candidates</p>
-                        </div>
-                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-user-check"></i>
+                    <div class="p-6 rounded-3xl bg-slate-800/80 border border-slate-700 shadow-sm space-y-2">
+                        <span class="text-xs font-extrabold text-slate-400 uppercase">M-Pesa Fees Collected</span>
+                        <div class="flex items-baseline justify-between">
+                            <h3 id="statRevenue" class="text-3xl font-black text-emerald-400">KES 0</h3>
+                            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-full">KES 80/app</span>
                         </div>
                     </div>
-
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-semibold text-rose-600 uppercase tracking-wider">M-Pesa Revenue</p>
-                            <h3 id="stat-revenue" class="text-3xl font-extrabold text-slate-900 mt-1">KES 0</h3>
-                            <p class="text-xs text-slate-500 mt-1">Application fees collected</p>
-                        </div>
-                        <div class="w-12 h-12 bg-rose-50 text-brand-600 rounded-xl flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-money-bill-wave"></i>
+                    <div class="p-6 rounded-3xl bg-slate-800/80 border border-slate-700 shadow-sm space-y-2">
+                        <span class="text-xs font-extrabold text-slate-400 uppercase">Shortlisted Candidates</span>
+                        <div class="flex items-baseline justify-between">
+                            <h3 id="statShortlisted" class="text-3xl font-black text-brand-400">0</h3>
+                            <span class="text-xs font-bold text-brand-400 bg-brand-500/20 px-2.5 py-1 rounded-full">Ready</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- KERICHO RECRUITMENT PROGRESS -->
-                <div class="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl border border-rose-900/35">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div class="space-y-2">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold">
-                                <i class="fa-solid fa-star text-amber-400"></i> New Branch Target: 42 Vacancies
-                            </span>
-                            <h3 class="text-2xl font-bold text-white">Kericho Branch Recruitment Tracker</h3>
-                            <p class="text-slate-300 text-sm max-w-2xl">
-                                Real-time applicant volume tracking for the upcoming Kericho branch grand opening.
-                            </p>
+                <!-- TABLE CONTROLS & EXPORT FEATURES -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/60 p-4 rounded-2xl border border-slate-700">
+                    <div class="flex flex-wrap items-center gap-3 flex-1">
+                        <div class="relative flex-1 min-w-[220px]">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="searchInput" oninput="filterApplicantsTable()" placeholder="Search by name, ID, phone or role..." 
+                                   class="w-full pl-9 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
+                        <select id="branchFilter" onchange="filterApplicantsTable()" class="px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white outline-none">
+                            <option value="ALL">All Branches</option>
+                            <option value="Kericho">Kericho Branch (New)</option>
+                            <option value="Nairobi">Nairobi HQ</option>
+                            <option value="Nakuru">Nakuru Branch</option>
+                            <option value="Eldoret">Eldoret Branch</option>
+                        </select>
+                    </div>
 
-                        <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 min-w-[220px] text-center">
-                            <p class="text-xs text-slate-300 uppercase tracking-wider">Kericho Submissions</p>
-                            <div class="text-3xl font-extrabold text-white mt-1" id="kericho-count-display">0 / 42 Target</div>
-                            <div class="w-full bg-slate-700 h-2.5 rounded-full mt-3 overflow-hidden">
-                                <div id="kericho-progress-bar" class="bg-brand-500 h-full transition-all duration-500" style="width: 0%"></div>
-                            </div>
-                        </div>
+                    <!-- EXPORT BUTTONS -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportTableToCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition flex items-center gap-2 shadow">
+                            <i class="fa-solid fa-file-excel"></i> Export CSV
+                        </button>
+                        <button onclick="exportTableToJSON()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl transition flex items-center gap-2 shadow">
+                            <i class="fa-solid fa-code"></i> Export JSON
+                        </button>
                     </div>
                 </div>
 
-                <!-- CHARTS -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-brand-600"></i> Applications by Branch
-                        </h4>
-                        <div class="h-64 relative flex items-center justify-center">
-                            <canvas id="branchChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-briefcase text-brand-600"></i> Applications by Job Role
-                        </h4>
-                        <div class="h-64 relative flex items-center justify-center">
-                            <canvas id="jobCategoryChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 2: APPLICANT TABLE -->
-            <section id="view-applicants" class="hidden space-y-6">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <div class="relative w-full md:w-96">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="filter-search" oninput="applyApplicantFilters()" placeholder="Search Name, ID Number, Phone, M-Pesa..." 
-                                   class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-600">
-                        </div>
-
-                        <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                            <button onclick="exportApplicantsCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-md flex items-center gap-2 transition">
-                                <i class="fa-solid fa-file-excel"></i> Export CSV
-                            </button>
-                        </div>
-                    </div>
-
-                    <hr class="border-slate-100">
-
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                        <div>
-                            <label class="block font-medium text-slate-600 mb-1">Branch</label>
-                            <select id="filter-location" onchange="applyApplicantFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
-                                <option value="ALL">All Branches</option>
-                                <option value="Kericho">Kericho</option>
-                                <option value="Nairobi">Nairobi</option>
-                                <option value="Eldoret">Eldoret</option>
-                                <option value="Nakuru">Nakuru</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-600 mb-1">Status</label>
-                            <select id="filter-status" onchange="applyApplicantFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
-                                <option value="ALL">All Statuses</option>
-                                <option value="Submitted">Submitted / Under Review</option>
-                                <option value="Shortlisted">Shortlisted</option>
-                                <option value="Interview Scheduled">Interview Scheduled</option>
-                                <option value="Hired">Hired</option>
-                                <option value="Rejected">Rejected</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-600 mb-1">Education Level</label>
-                            <select id="filter-education" onchange="applyApplicantFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
-                                <option value="ALL">All Education Levels</option>
-                                <option value="KCSE Certificate">KCSE Certificate</option>
-                                <option value="Certificate Course">Certificate Course</option>
-                                <option value="Diploma">Diploma</option>
-                                <option value="Bachelor Degree">Bachelor Degree</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium text-slate-600 mb-1">Reset</label>
-                            <button onclick="resetFilters()" class="w-full p-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition text-center">
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <!-- APPLICANTS TABLE -->
+                <div class="bg-slate-800/80 rounded-3xl border border-slate-700 overflow-hidden shadow-xl">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-4">Applicant Name / ID</th>
-                                    <th class="p-4">Applied Role & Branch</th>
-                                    <th class="p-4">Contact & Location</th>
-                                    <th class="p-4">M-Pesa Reference</th>
-                                    <th class="p-4">Status</th>
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-900/90 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-700">
+                                    <th class="p-4">Applicant & ID</th>
+                                    <th class="p-4">Role & Location</th>
+                                    <th class="p-4">Contact (WhatsApp)</th>
+                                    <th class="p-4">M-Pesa Fee</th>
+                                    <th class="p-4">Application Status</th>
                                     <th class="p-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="applicant-table-body" class="divide-y divide-slate-100">
-                                <tr>
-                                    <td colspan="6" class="p-8 text-center text-slate-400">
-                                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-brand-600"></i>
-                                        <p>Loading application data from Cloud Firestore...</p>
-                                    </td>
-                                </tr>
+                            <tbody id="applicantsTableBody" class="divide-y divide-slate-700/60 font-medium">
+                                <!-- Populated dynamically via onSnapshot -->
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </section>
 
-            <!-- TAB 3: SETTINGS -->
-            <section id="view-settings" class="hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center font-bold">
-                                <i class="fa-solid fa-money-bill-transfer"></i>
+            </div>
+
+            <!-- ======================================================= -->
+            <!-- TAB 2: PAYMENT & SETTINGS CONFIGURATION -->
+            <!-- ======================================================= -->
+            <div id="tabContent-settings" class="hidden space-y-8 max-w-4xl mx-auto">
+                
+                <div class="p-8 rounded-3xl bg-slate-800/80 border border-slate-700 shadow-xl space-y-6">
+                    <div>
+                        <h2 class="text-xl font-black text-white">Dynamic Payment Details & Fees</h2>
+                        <p class="text-xs text-slate-400 mt-1">Configure M-Pesa Till number, Paybill details, application fees, and admin password synchronized across Firebase in real-time.</p>
+                    </div>
+
+                    <form onsubmit="saveAdminSettings(event)" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">M-Pesa Till Number / Paybill <span class="text-red-400">*</span></label>
+                                <input type="text" id="settingTillNo" required value="1601371" 
+                                       class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white outline-none focus:ring-2 focus:ring-brand-500">
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-base">Live M-Pesa Fee Control</h3>
-                                <p class="text-xs text-slate-500">Synced live to applicant portal</p>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Application Processing Fee (KES) <span class="text-red-400">*</span></label>
+                                <input type="number" id="settingFeeAmount" required value="80" 
+                                       class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white outline-none focus:ring-2 focus:ring-brand-500">
                             </div>
                         </div>
 
-                        <form id="payment-settings-form" onsubmit="savePaymentSettings(event)" class="space-y-4 pt-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Application Fee (KES)</label>
-                                <input type="number" id="setting-app-fee" value="80" min="0" required 
-                                       class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 focus:ring-2 focus:ring-brand-600">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">M-Pesa Till / Paybill Number</label>
-                                <input type="text" id="setting-till-number" value="1601371" required 
-                                       class="w-full p-2.5 border border-slate-300 rounded-xl font-mono text-slate-800 focus:ring-2 focus:ring-brand-600">
-                            </div>
-
-                            <button type="submit" id="save-settings-btn" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-sm shadow-md transition">
-                                Save & Sync to Firebase Cloud
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-rose-100 text-brand-600 rounded-xl flex items-center justify-center font-bold">
-                                <i class="fa-solid fa-key"></i>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Business Account Name <span class="text-red-400">*</span></label>
+                                <input type="text" id="settingAccountName" required value="Wajose Smart Wear Ltd" 
+                                       class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white outline-none focus:ring-2 focus:ring-brand-500">
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-900 text-base">Admin Security Passcode</h3>
-                                <p class="text-xs text-slate-500">Update master PIN stored in cloud</p>
+                                <label class="block text-xs font-bold text-slate-300 mb-1">Dynamic Admin Password (6 Digits) <span class="text-red-400">*</span></label>
+                                <input type="text" id="settingAdminPassword" required value="115800" 
+                                       class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-mono outline-none focus:ring-2 focus:ring-brand-500">
                             </div>
                         </div>
 
-                        <form id="pin-change-form" onsubmit="changeMasterPin(event)" class="space-y-4 pt-2">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">New Master PIN</label>
-                                <input type="password" id="setting-new-pin" placeholder="Enter new passcode" required minlength="4"
-                                       class="w-full p-2.5 border border-slate-300 rounded-xl font-mono focus:ring-2 focus:ring-brand-600">
-                            </div>
+                        <div class="p-4 rounded-2xl bg-slate-900 border border-slate-700 text-xs text-slate-400 space-y-1">
+                            <span class="font-bold text-white block">Real-time Cloud Sync Note:</span>
+                            <p>Updating settings here instantly updates the payment prompt on the main Wajose Smart Wear website portal through Firebase Firestore listener bindings.</p>
+                        </div>
 
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Confirm New PIN</label>
-                                <input type="password" id="setting-confirm-pin" placeholder="Re-enter new passcode" required minlength="4"
-                                       class="w-full p-2.5 border border-slate-300 rounded-xl font-mono focus:ring-2 focus:ring-brand-600">
-                            </div>
-
-                            <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-sm shadow-md transition">
-                                Update Master PIN
-                            </button>
-                        </form>
-                    </div>
+                        <button type="submit" class="px-6 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-lg transition">
+                            Save & Push Settings to Firebase
+                        </button>
+                    </form>
                 </div>
-            </section>
+
+            </div>
+
         </main>
     </div>
 
-    <!-- APPLICANT DETAIL MODAL VIEW -->
-    <div id="applicant-modal" class="fixed inset-0 z-50 hidden bg-slate-900 bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
-            <div class="bg-slate-900 text-white p-5 flex items-center justify-between border-b border-slate-800">
+    <!-- ======================================================= -->
+    <!-- MODAL: EDIT APPLICANT DETAILS -->
+    <!-- ======================================================= -->
+    <div id="editApplicantModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-8 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-black text-white">Edit Applicant Record</h3>
+                <button onclick="document.getElementById('editApplicantModal').classList.add('hidden')" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitEditApplicant(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="editDocId">
                 <div>
-                    <h3 id="modal-applicant-name" class="text-lg font-bold">Applicant Details</h3>
-                    <p id="modal-applicant-role" class="text-xs text-rose-300">Role & Location</p>
+                    <label class="block font-bold text-slate-300 mb-1">Full Name</label>
+                    <input type="text" id="editFullName" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none">
                 </div>
-                <button onclick="closeApplicantModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div id="modal-applicant-body" class="p-6 overflow-y-auto space-y-6 text-sm"></div>
-
-            <div class="bg-slate-50 p-4 border-t border-slate-200 flex items-center justify-between">
-                <button onclick="deleteSingleApplicantFromModal()" class="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl text-xs font-bold transition">
-                    <i class="fa-solid fa-trash mr-1"></i> Delete Application
-                </button>
-                <button onclick="closeApplicantModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition">
-                    Close
-                </button>
-            </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1">National ID</label>
+                        <input type="text" id="editIdNumber" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1">WhatsApp Phone</label>
+                        <input type="text" id="editWhatsApp" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1">Application Status</label>
+                    <select id="editStatus" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white outline-none">
+                        <option value="Under Initial HR Review">Under Initial HR Review</option>
+                        <option value="Shortlisted for Interview">Shortlisted for Interview</option>
+                        <option value="Interview Passed">Interview Passed</option>
+                        <option value="Hired & Onboarded">Hired & Onboarded</option>
+                        <option value="Application Rejected">Application Rejected</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="document.getElementById('editApplicantModal').classList.add('hidden')" class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 font-bold hover:bg-slate-800">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- FIREBASE SDKs & CONTROLLER SCRIPT -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    <!-- FIREBASE SDK INCLUDES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Provided Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCfjNymJSzrBWgdhVGx7fB_k7ZWqy4QG0Y",
             authDomain: "wajo-4de60.firebaseapp.com",
@@ -401,459 +308,371 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
+        window.db = db;
+        window.firebaseDocs = { collection, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc };
+
+        signInAnonymously(auth).then(() => {
+            document.getElementById('syncStatusBadge').innerHTML = '<i class="fa-solid fa-circle text-[8px]"></i> Connected to Firestore';
+            document.getElementById('syncStatusBadge').className = 'text-emerald-400 font-bold';
+            initRealtimeListeners();
+        }).catch(err => {
+            console.log("Auth error:", err);
+            document.getElementById('syncStatusBadge').textContent = "Offline Mode Active";
+            loadLocalFallbackData();
+        });
+    </script>
+
+    <!-- ADMIN LOGIC & REALTIME SYNC -->
+    <script>
         let allApplicants = [];
-        let filteredApplicants = [];
-        let currentModalApplicantId = null;
-        let masterPin = "115800";
-        let branchChartInstance = null;
-        let jobCategoryChartInstance = null;
-        let unsubscribeApplicants = null;
+        let currentAdminPassword = "115800";
 
-        async function fetchAdminConfig() {
+        // -------------------------------------------------------------
+        // AUTHENTICATION
+        // -------------------------------------------------------------
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const entered = document.getElementById('adminPasswordInput').value.trim();
+
+            // Fetch password from Firebase settings if available
             try {
-                const docRef = doc(db, "settings", "admin_config");
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().pin) {
-                    masterPin = docSnap.data().pin;
-                } else {
-                    await setDoc(docRef, { pin: "115800" }, { merge: true });
+                const docRef = window.firebaseDocs.doc(window.db, 'wajose_system_settings', 'config');
+                const docSnap = await window.firebaseDocs.getDoc(docRef);
+                if (docSnap.exists() && docSnap.data().adminPassword) {
+                    currentAdminPassword = docSnap.data().adminPassword;
                 }
-            } catch(e) {
-                console.warn("Using fallback PIN", e);
+            } catch (err) {
+                console.log("Using default password");
+            }
+
+            if (entered === currentAdminPassword) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                showNotification('success', 'Admin Authenticated Successfully.');
+            } else {
+                showNotification('error', 'Incorrect Admin Password. Default is 115800.');
             }
         }
-        fetchAdminConfig();
 
-        window.handleLogin = async function(e) {
-            e.preventDefault();
-            const inputPin = document.getElementById('pin-input').value.trim();
-            const btn = document.getElementById('login-btn');
+        function logoutAdmin() {
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            showNotification('success', 'Logged out successfully.');
+        }
+
+        // -------------------------------------------------------------
+        // TAB SWITCHING
+        // -------------------------------------------------------------
+        function switchAdminTab(tabName) {
+            document.getElementById('tabContent-applications').classList.add('hidden');
+            document.getElementById('tabContent-settings').classList.add('hidden');
+            document.getElementById('nav-applications').classList.remove('bg-brand-600', 'text-white');
+            document.getElementById('nav-applications').classList.add('text-slate-300');
+            document.getElementById('nav-settings').classList.remove('bg-brand-600', 'text-white');
+            document.getElementById('nav-settings').classList.add('text-slate-300');
+
+            document.getElementById('tabContent-' + tabName).classList.remove('hidden');
+            document.getElementById('nav-' + tabName).classList.add('bg-brand-600', 'text-white');
+            document.getElementById('nav-' + tabName).classList.remove('text-slate-300');
+        }
+
+        // -------------------------------------------------------------
+        // TOAST NOTIFICATION SYSTEM
+        // -------------------------------------------------------------
+        function showNotification(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const isSuccess = type === 'success';
             
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Validating...`;
+            toast.className = `pointer-events-auto flex items-start justify-between p-4 rounded-2xl shadow-2xl text-white font-medium text-xs sm:text-sm border transition transform duration-300 ${
+                isSuccess ? 'bg-emerald-600 border-emerald-500' : 'bg-red-600 border-red-500'
+            }`;
 
-            setTimeout(async () => {
-                await fetchAdminConfig();
-                if (inputPin === masterPin) {
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('admin-app').classList.remove('hidden');
-                    showToast("Portal Unlocked Successfully!", "success");
-                    startLiveSync();
-                    loadPaymentSettingsUI();
-                } else {
-                    showToast("Incorrect Master PIN! Try again.", "error");
-                    btn.innerHTML = `<span>Unlock Dashboard</span><i class="fa-solid fa-arrow-right text-sm"></i>`;
-                }
-            }, 500);
-        };
+            toast.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <i class="fa-solid ${isSuccess ? 'fa-circle-check text-lg' : 'fa-triangle-exclamation text-lg'} mt-0.5"></i>
+                    <span class="leading-relaxed">${message}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="ml-4 text-white/80 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            `;
 
-        window.lockPortal = function() {
-            document.getElementById('admin-app').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('pin-input').value = '';
-            if (unsubscribeApplicants) unsubscribeApplicants();
-            showToast("Admin Portal Locked", "info");
-        };
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentElement) toast.remove(); }, 6000);
+        }
 
-        window.refreshData = function() {
-            showToast("Syncing data from Cloud...", "info");
-            startLiveSync();
-        };
-
-        // Real-Time Firebase Firestore Synchronization
-        function startLiveSync() {
-            const dot = document.getElementById('connection-dot');
-            const text = document.getElementById('connection-text');
-            
-            dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-            text.innerText = "Firestore Live Synced";
-
-            const q = collection(db, "applications");
-            if (unsubscribeApplicants) unsubscribeApplicants();
-
-            unsubscribeApplicants = onSnapshot(q, (snapshot) => {
-                allApplicants = [];
-                snapshot.forEach((docSnap) => {
-                    const raw = docSnap.data();
-                    allApplicants.push({
-                        id: docSnap.id,
-                        fullName: raw.fullName || raw.name || raw.applicantName || 'Anonymous Candidate',
-                        idNumber: raw.idNumber || raw.nationalId || raw.id || 'N/A',
-                        jobTitle: raw.jobTitle || raw.title || raw.role || 'General Staff',
-                        jobLocation: raw.jobLocation || raw.location || raw.branch || 'Kericho',
-                        whatsapp: raw.whatsapp || raw.phone || raw.mobile || 'N/A',
-                        county: raw.county || raw.address || 'N/A',
-                        education: raw.education || raw.educationLevel || 'KCSE Certificate',
-                        mpesaCode: raw.mpesaCode || raw.mpesa || raw.code || 'VERIFIED',
-                        amountPaid: raw.amountPaid || raw.fee || 80,
-                        status: raw.status || 'Submitted',
-                        email: raw.email || 'N/A',
-                        gender: raw.gender || 'N/A',
-                        dob: raw.dob || 'N/A',
-                        q1_answer: raw.q1_answer || raw.customAnswer1 || 'N/A',
-                        q2_answer: raw.q2_answer || raw.customAnswer2 || 'N/A',
-                        ...raw
+        // -------------------------------------------------------------
+        // REALTIME FIRESTORE ONSNAPSHOT SYNC
+        // -------------------------------------------------------------
+        function initRealtimeListeners() {
+            // Listen to applications collection in real-time
+            window.firebaseDocs.onSnapshot(
+                window.firebaseDocs.collection(window.db, 'wajose_job_applications'),
+                (snapshot) => {
+                    allApplicants = [];
+                    snapshot.forEach((doc) => {
+                        allApplicants.push({ docId: doc.id, ...doc.data() });
                     });
-                });
-                applyApplicantFilters();
-                updateDashboardStats();
-            }, (error) => {
-                console.error("Firestore Listen Error:", error);
-                dot.className = "w-2 h-2 rounded-full bg-rose-500";
-                text.innerText = "Connection Error (Check Rules)";
-                showToast("Failed to fetch applications from cloud", "error");
-            });
-        }
 
-        function updateDashboardStats() {
-            const total = allApplicants.length;
-            const pending = allApplicants.filter(a => a.status === 'Submitted' || a.status === 'Under Review').length;
-            const shortlisted = allApplicants.filter(a => a.status === 'Shortlisted' || a.status === 'Hired').length;
-            const totalRev = allApplicants.reduce((sum, a) => sum + (Number(a.amountPaid) || 80), 0);
+                    // Also merge local backup if any
+                    const localBackup = JSON.parse(localStorage.getItem('wajose_apps_backup') || '[]');
+                    localBackup.forEach(b => {
+                        if (!allApplicants.some(a => a.docId === b.docId || a.idNumber === b.idNumber)) {
+                            allApplicants.push(b);
+                        }
+                    });
 
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-pending').innerText = pending;
-            document.getElementById('stat-shortlisted').innerText = shortlisted;
-            document.getElementById('stat-revenue').innerText = `KES ${totalRev.toLocaleString()}`;
-            document.getElementById('badge-applicant-count').innerText = total;
-
-            const kerichoCount = allApplicants.filter(a => String(a.jobLocation).toLowerCase().includes('kericho')).length;
-            document.getElementById('kericho-count-display').innerText = `${kerichoCount} / 42 Target`;
-            const percent = Math.min(100, Math.round((kerichoCount / 42) * 100));
-            document.getElementById('kericho-progress-bar').style.width = `${percent}%`;
-
-            renderCharts();
-        }
-
-        function renderCharts() {
-            const branchCounts = { Kericho: 0, Nairobi: 0, Eldoret: 0, Nakuru: 0 };
-            allApplicants.forEach(a => {
-                const loc = a.jobLocation;
-                if (branchCounts[loc] !== undefined) branchCounts[loc]++;
-                else branchCounts['Other'] = (branchCounts['Other'] || 0) + 1;
-            });
-
-            const ctxBranch = document.getElementById('branchChart').getContext('2d');
-            if (branchChartInstance) branchChartInstance.destroy();
-            branchChartInstance = new Chart(ctxBranch, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(branchCounts),
-                    datasets: [{
-                        data: Object.values(branchCounts),
-                        backgroundColor: ['#e11d48', '#2563eb', '#059669', '#d97706', '#64748b']
-                    }]
+                    renderApplicantsTable(allApplicants);
+                    updateAnalyticsStats(allApplicants);
                 },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+                (error) => {
+                    console.error("Firestore listener error:", error);
+                    loadLocalFallbackData();
+                }
+            );
 
-            const jobCounts = {};
-            allApplicants.forEach(a => {
-                const title = a.jobTitle;
-                jobCounts[title] = (jobCounts[title] || 0) + 1;
-            });
-
-            const ctxJob = document.getElementById('jobCategoryChart').getContext('2d');
-            if (jobCategoryChartInstance) jobCategoryChartInstance.destroy();
-            jobCategoryChartInstance = new Chart(ctxJob, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(jobCounts).slice(0, 6),
-                    datasets: [{
-                        label: 'Applicants',
-                        data: Object.values(jobCounts).slice(0, 6),
-                        backgroundColor: '#e11d48'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            // Listen to settings config
+            window.firebaseDocs.onSnapshot(
+                window.firebaseDocs.doc(window.db, 'wajose_system_settings', 'config'),
+                (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        document.getElementById('settingTillNo').value = data.tillNumber || '1601371';
+                        document.getElementById('settingFeeAmount').value = data.feeAmount || 80;
+                        document.getElementById('settingAccountName').value = data.accountName || 'Wajose Smart Wear Ltd';
+                        document.getElementById('settingAdminPassword').value = data.adminPassword || '115800';
+                        currentAdminPassword = data.adminPassword || '115800';
+                    }
+                }
+            );
         }
 
-        window.applyApplicantFilters = function() {
-            const searchTerm = document.getElementById('filter-search').value.toLowerCase().trim();
-            const locFilter = document.getElementById('filter-location').value;
-            const statusFilter = document.getElementById('filter-status').value;
-            const eduFilter = document.getElementById('filter-education').value;
+        function loadLocalFallbackData() {
+            const localBackup = JSON.parse(localStorage.getItem('wajose_apps_backup') || '[]');
+            allApplicants = localBackup;
+            renderApplicantsTable(allApplicants);
+            updateAnalyticsStats(allApplicants);
+        }
 
-            filteredApplicants = allApplicants.filter(app => {
-                const matchesSearch = !searchTerm || 
-                    app.fullName.toLowerCase().includes(searchTerm) ||
-                    app.idNumber.toLowerCase().includes(searchTerm) ||
-                    app.whatsapp.toLowerCase().includes(searchTerm) ||
-                    app.mpesaCode.toLowerCase().includes(searchTerm);
+        // -------------------------------------------------------------
+        // RENDER APPLICANTS TABLE & ANALYTICS
+        // -------------------------------------------------------------
+        function renderApplicantsTable(dataList) {
+            const tbody = document.getElementById('applicantsTableBody');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const branchVal = document.getElementById('branchFilter').value;
 
-                const matchesLoc = locFilter === 'ALL' || app.jobLocation.toLowerCase().includes(locFilter.toLowerCase());
-                const matchesStatus = statusFilter === 'ALL' || app.status === statusFilter;
-                const matchesEdu = eduFilter === 'ALL' || app.education === eduFilter;
+            const filtered = dataList.filter(app => {
+                const matchesSearch = 
+                    (app.fullName && app.fullName.toLowerCase().includes(searchVal)) ||
+                    (app.idNumber && app.idNumber.toLowerCase().includes(searchVal)) ||
+                    (app.whatsApp && app.whatsApp.toLowerCase().includes(searchVal)) ||
+                    (app.jobTitle && app.jobTitle.toLowerCase().includes(searchVal));
 
-                return matchesSearch && matchesLoc && matchesStatus && matchesEdu;
+                const matchesBranch = (branchVal === 'ALL') || (app.location && app.location.toLowerCase().includes(branchVal.toLowerCase()));
+
+                return matchesSearch && matchesBranch;
             });
 
-            renderApplicantTable();
-        };
-
-        window.resetFilters = function() {
-            document.getElementById('filter-search').value = '';
-            document.getElementById('filter-location').value = 'ALL';
-            document.getElementById('filter-status').value = 'ALL';
-            document.getElementById('filter-education').value = 'ALL';
-            applyApplicantFilters();
-        };
-
-        function renderApplicantTable() {
-            const tbody = document.getElementById('applicant-table-body');
-            tbody.innerHTML = '';
-
-            if (filteredApplicants.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="p-8 text-center text-slate-400">
-                            <i class="fa-solid fa-inbox text-3xl mb-2 text-slate-300"></i>
-                            <p>No job application records found.</p>
-                        </td>
-                    </tr>
-                `;
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">No applicant records found matching your filters.</td></tr>`;
                 return;
             }
 
-            filteredApplicants.forEach(app => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-
-                let statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">${app.status}</span>`;
-                if (app.status === 'Shortlisted') statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">Shortlisted</span>`;
-                if (app.status === 'Hired') statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Hired</span>`;
-                if (app.status === 'Rejected') statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">Rejected</span>`;
-
-                tr.innerHTML = `
+            tbody.innerHTML = filtered.map(app => `
+                <tr class="hover:bg-slate-700/40 transition">
                     <td class="p-4">
-                        <div class="font-bold text-slate-900">${escapeHtml(app.fullName)}</div>
-                        <div class="text-xs text-slate-400">ID: ${escapeHtml(app.idNumber)}</div>
+                        <strong class="text-white block text-sm">${app.fullName || 'N/A'}</strong>
+                        <span class="text-slate-400 font-mono text-[11px]">ID: ${app.idNumber || 'N/A'}</span>
                     </td>
                     <td class="p-4">
-                        <div class="font-semibold text-slate-800">${escapeHtml(app.jobTitle)}</div>
-                        <div class="text-xs text-rose-600 font-medium">${escapeHtml(app.jobLocation)} Branch</div>
+                        <strong class="text-brand-400 block">${app.jobTitle || 'General'}</strong>
+                        <span class="text-slate-400">${app.location || 'N/A'}</span>
                     </td>
-                    <td class="p-4 text-xs">
-                        <div><i class="fa-solid fa-phone text-slate-400 mr-1"></i> ${escapeHtml(app.whatsapp)}</div>
-                        <div class="text-slate-400"><i class="fa-solid fa-map-pin text-slate-400 mr-1"></i> ${escapeHtml(app.county)} County</div>
+                    <td class="p-4">
+                        <a href="https://wa.me/254${(app.whatsApp || '').replace(/^0/, '')}" target="_blank" class="text-emerald-400 font-bold hover:underline">
+                            <i class="fa-brands fa-whatsapp"></i> ${app.whatsApp || 'N/A'}
+                        </a>
                     </td>
-                    <td class="p-4 text-xs font-mono">
-                        <span class="bg-slate-100 px-2 py-1 rounded text-slate-700 font-bold">${escapeHtml(app.mpesaCode)}</span>
-                        <div class="text-[10px] text-emerald-600 font-sans mt-0.5">KES ${app.amountPaid} Paid</div>
+                    <td class="p-4">
+                        <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">
+                            KES ${app.paymentFee || 80} (Verified)
+                        </span>
+                        <span class="block font-mono text-[10px] text-slate-400 mt-0.5">${app.mpesaCode || 'MPESA-OK'}</span>
                     </td>
-                    <td class="p-4">${statusBadge}</td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black ${
+                            app.status === 'Hired & Onboarded' ? 'bg-emerald-500 text-slate-950' :
+                            app.status === 'Shortlisted for Interview' ? 'bg-amber-400 text-slate-950' :
+                            app.status === 'Application Rejected' ? 'bg-red-500 text-white' :
+                            'bg-brand-500/20 text-brand-300'
+                        }">
+                            ${app.status || 'Under Initial HR Review'}
+                        </span>
+                    </td>
                     <td class="p-4 text-right space-x-2">
-                        <button onclick="viewApplicantDetails('${app.id}')" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition" title="View Profile">
-                            <i class="fa-solid fa-eye"></i>
+                        <button onclick="openEditModal('${app.docId || app.id}')" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold transition">
+                            <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button onclick="quickDeleteApplicant('${app.id}')" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold transition" title="Delete">
+                        <button onclick="deleteApplicant('${app.docId || app.id}')" class="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-700 text-white font-bold transition">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                </tr>
+            `).join('');
         }
 
-        window.viewApplicantDetails = function(id) {
-            const app = allApplicants.find(a => a.id === id);
+        function filterApplicantsTable() {
+            renderApplicantsTable(allApplicants);
+        }
+
+        function updateAnalyticsStats(dataList) {
+            const total = dataList.length;
+            const kerichoCount = dataList.filter(a => a.location && a.location.toLowerCase().includes('kericho')).length;
+            const revenue = total * 80;
+            const shortlisted = dataList.filter(a => a.status === 'Shortlisted for Interview' || a.status === 'Hired & Onboarded').length;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statKericho').textContent = kerichoCount;
+            document.getElementById('statRevenue').textContent = 'KES ' + revenue.toLocaleString();
+            document.getElementById('statShortlisted').textContent = shortlisted;
+        }
+
+        // -------------------------------------------------------------
+        // EDIT & DELETE APPLICANTS
+        // -------------------------------------------------------------
+        function openEditModal(docId) {
+            const app = allApplicants.find(a => (a.docId === docId || a.id === docId));
             if (!app) return;
-            currentModalApplicantId = id;
 
-            document.getElementById('modal-applicant-name').innerText = app.fullName;
-            document.getElementById('modal-applicant-role').innerText = `${app.jobTitle} - ${app.jobLocation} Branch`;
+            document.getElementById('editDocId').value = docId;
+            document.getElementById('editFullName').value = app.fullName || '';
+            document.getElementById('editIdNumber').value = app.idNumber || '';
+            document.getElementById('editWhatsApp').value = app.whatsApp || '';
+            document.getElementById('editStatus').value = app.status || 'Under Initial HR Review';
 
-            const modalBody = document.getElementById('modal-applicant-body');
-            modalBody.innerHTML = `
-                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div>
-                        <span class="text-xs text-slate-400 block">National ID Number</span>
-                        <span class="font-bold text-slate-800">${escapeHtml(app.idNumber)}</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-slate-400 block">Gender & DOB</span>
-                        <span class="font-bold text-slate-800">${escapeHtml(app.gender)} (${escapeHtml(app.dob)})</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-slate-400 block">WhatsApp Phone</span>
-                        <span class="font-bold text-slate-800">${escapeHtml(app.whatsapp)}</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-slate-400 block">County</span>
-                        <span class="font-bold text-slate-800">${escapeHtml(app.county)}</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-slate-400 block">Education Level</span>
-                        <span class="font-bold text-slate-800">${escapeHtml(app.education)}</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-slate-400 block">M-Pesa Reference</span>
-                        <span class="font-bold text-emerald-700 font-mono">${escapeHtml(app.mpesaCode)}</span>
-                    </div>
-                </div>
+            document.getElementById('editApplicantModal').classList.remove('hidden');
+        }
 
-                <div class="space-y-2 bg-white p-4 rounded-xl border border-slate-200">
-                    <h4 class="font-bold text-xs uppercase text-slate-500">Custom Role Responses</h4>
-                    <p class="text-xs"><strong>Q1:</strong> ${escapeHtml(app.q1_answer)}</p>
-                    <p class="text-xs"><strong>Q2:</strong> ${escapeHtml(app.q2_answer)}</p>
-                </div>
+        async function submitEditApplicant(e) {
+            e.preventDefault();
+            const docId = document.getElementById('editDocId').value;
+            const updatedData = {
+                fullName: document.getElementById('editFullName').value.trim(),
+                idNumber: document.getElementById('editIdNumber').value.trim(),
+                whatsApp: document.getElementById('editWhatsApp').value.trim(),
+                status: document.getElementById('editStatus').value
+            };
 
-                <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl">
-                    <label class="block text-xs font-bold text-brand-900 mb-1">Update Hiring Status</label>
-                    <div class="flex gap-2">
-                        <select id="modal-status-select" class="flex-1 p-2 bg-white border border-rose-300 rounded-lg text-xs font-semibold">
-                            <option value="Submitted" ${app.status === 'Submitted' ? 'selected' : ''}>Submitted / Under Review</option>
-                            <option value="Shortlisted" ${app.status === 'Shortlisted' ? 'selected' : ''}>Shortlisted</option>
-                            <option value="Interview Scheduled" ${app.status === 'Interview Scheduled' ? 'selected' : ''}>Interview Scheduled</option>
-                            <option value="Hired" ${app.status === 'Hired' ? 'selected' : ''}>Hired</option>
-                            <option value="Rejected" ${app.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
-                        </select>
-                        <button onclick="updateApplicantStatusFromModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs rounded-lg transition">
-                            Save Status
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('applicant-modal').classList.remove('hidden');
-        };
-
-        window.closeApplicantModal = function() {
-            document.getElementById('applicant-modal').classList.add('hidden');
-            currentModalApplicantId = null;
-        };
-
-        window.updateApplicantStatusFromModal = async function() {
-            if (!currentModalApplicantId) return;
-            const newStatus = document.getElementById('modal-status-select').value;
             try {
-                await updateDoc(doc(db, "applications", currentModalApplicantId), {
-                    status: newStatus,
-                    updatedAt: new Date().toISOString()
-                });
-                showToast(`Status updated to ${newStatus}`, "success");
-                closeApplicantModal();
-            } catch(e) {
-                showToast("Failed to update status", "error");
-            }
-        };
-
-        window.quickDeleteApplicant = async function(id) {
-            if (!confirm("Are you sure you want to permanently delete this application?")) return;
-            try {
-                await deleteDoc(doc(db, "applications", id));
-                showToast("Application deleted", "info");
-            } catch(e) {
-                showToast("Failed to delete", "error");
-            }
-        };
-
-        window.deleteSingleApplicantFromModal = function() {
-            if (currentModalApplicantId) {
-                quickDeleteApplicant(currentModalApplicantId);
-                closeApplicantModal();
-            }
-        };
-
-        async function loadPaymentSettingsUI() {
-            try {
-                const docSnap = await getDoc(doc(db, "settings", "payment_config"));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (data.app_fee) document.getElementById('setting-app-fee').value = data.app_fee;
-                    if (data.till_number) document.getElementById('setting-till-number').value = data.till_number;
+                if (!docId.startsWith('LOCAL-')) {
+                    const docRef = window.firebaseDocs.doc(window.db, 'wajose_job_applications', docId);
+                    await window.firebaseDocs.updateDoc(docRef, updatedData);
+                } else {
+                    let localBackup = JSON.parse(localStorage.getItem('wajose_apps_backup') || '[]');
+                    localBackup = localBackup.map(b => b.id === docId ? { ...b, ...updatedData } : b);
+                    localStorage.setItem('wajose_apps_backup', JSON.stringify(localBackup));
                 }
-            } catch(e) {
-                console.warn("Could not load settings", e);
+
+                document.getElementById('editApplicantModal').classList.add('hidden');
+                showNotification('success', 'Applicant record updated successfully.');
+            } catch (err) {
+                showNotification('error', 'Error updating applicant record.');
             }
         }
 
-        window.savePaymentSettings = async function(e) {
-            e.preventDefault();
-            const fee = Number(document.getElementById('setting-app-fee').value);
-            const till = document.getElementById('setting-till-number').value.trim();
+        async function deleteApplicant(docId) {
+            if (!confirm("Are you sure you want to delete this applicant record?")) return;
 
             try {
-                await setDoc(doc(db, "settings", "payment_config"), {
-                    app_fee: fee,
-                    till_number: till,
-                    updatedAt: new Date().toISOString()
-                }, { merge: true });
-
-                showToast("Payment Settings Synced to Cloud!", "success");
-            } catch(err) {
-                showToast("Failed to save settings", "error");
+                if (!docId.startsWith('LOCAL-')) {
+                    const docRef = window.firebaseDocs.doc(window.db, 'wajose_job_applications', docId);
+                    await window.firebaseDocs.deleteDoc(docRef);
+                } else {
+                    let localBackup = JSON.parse(localStorage.getItem('wajose_apps_backup') || '[]');
+                    localBackup = localBackup.filter(b => b.id !== docId);
+                    localStorage.setItem('wajose_apps_backup', JSON.stringify(localBackup));
+                }
+                showNotification('success', 'Applicant record deleted.');
+            } catch (err) {
+                showNotification('error', 'Error deleting record.');
             }
-        };
+        }
 
-        window.changeMasterPin = async function(e) {
+        // -------------------------------------------------------------
+        // SAVE SETTINGS TO FIREBASE
+        // -------------------------------------------------------------
+        async function saveAdminSettings(e) {
             e.preventDefault();
-            const newPin = document.getElementById('setting-new-pin').value.trim();
-            const confirmPin = document.getElementById('setting-confirm-pin').value.trim();
+            const configData = {
+                tillNumber: document.getElementById('settingTillNo').value.trim(),
+                feeAmount: Number(document.getElementById('settingFeeAmount').value),
+                accountName: document.getElementById('settingAccountName').value.trim(),
+                adminPassword: document.getElementById('settingAdminPassword').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
 
-            if (newPin !== confirmPin) {
-                showToast("PIN passwords do not match!", "error");
+            try {
+                const docRef = window.firebaseDocs.doc(window.db, 'wajose_system_settings', 'config');
+                await window.firebaseDocs.setDoc(docRef, configData);
+                showNotification('success', 'Settings successfully pushed to Firebase Cloud!');
+            } catch (err) {
+                showNotification('error', 'Failed to save settings to cloud.');
+            }
+        }
+
+        // -------------------------------------------------------------
+        // EXPORT FEATURES (CSV & JSON)
+        // -------------------------------------------------------------
+        function exportTableToCSV() {
+            if (allApplicants.length === 0) {
+                showNotification('error', 'No data available to export.');
                 return;
             }
 
-            try {
-                await setDoc(doc(db, "settings", "admin_config"), { pin: newPin }, { merge: true });
-                masterPin = newPin;
-                showToast("Master PIN updated successfully!", "success");
-                document.getElementById('pin-change-form').reset();
-            } catch(e) {
-                showToast("Failed to change PIN", "error");
-            }
-        };
+            const headers = ["Full Name", "National ID", "Job Title", "Location", "WhatsApp", "County", "Education", "Status", "M-Pesa Code"];
+            let csvRows = [headers.join(",")];
 
-        window.exportApplicantsCSV = function() {
-            if (filteredApplicants.length === 0) {
-                showToast("No data to export!", "error");
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,ID Number,Full Name,Role,Branch,Phone,Status,M-Pesa Code\n";
-            filteredApplicants.forEach(a => {
-                csvContent += `"${a.idNumber}","${a.fullName}","${a.jobTitle}","${a.jobLocation}","${a.whatsapp}","${a.status}","${a.mpesaCode}"\n`;
+            allApplicants.forEach(a => {
+                const row = [
+                    `"${a.fullName || ''}"`,
+                    `"${a.idNumber || ''}"`,
+                    `"${a.jobTitle || ''}"`,
+                    `"${a.location || ''}"`,
+                    `"${a.whatsApp || ''}"`,
+                    `"${a.county || ''}"`,
+                    `"${a.educationLevel || ''}"`,
+                    `"${a.status || ''}"`,
+                    `"${a.mpesaCode || ''}"`
+                ];
+                csvRows.push(row.join(","));
             });
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `wajose_applicants_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast("CSV Export generated successfully!", "success");
-        };
-
-        window.switchTab = function(tabName) {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-applicants').classList.add('hidden');
-            document.getElementById('view-settings').classList.add('hidden');
-
-            document.getElementById('tab-dashboard').className = "py-3.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap";
-            document.getElementById('tab-applicants').className = "py-3.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap";
-            document.getElementById('tab-settings').className = "py-3.5 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center gap-2 whitespace-nowrap";
-
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabName}`).className = "py-3.5 border-b-2 border-brand-600 text-brand-600 font-semibold flex items-center gap-2 whitespace-nowrap";
-        };
-
-        function showToast(message, type = "info") {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `p-4 rounded-xl shadow-xl text-white text-xs font-bold flex items-center gap-3 transition-all ${
-                type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-800'
-            }`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${escapeHtml(message)}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
+            const blob = new Blob([csvRows.join("\n")], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `Wajose_Applicants_Export_${new Date().toISOString().slice(0,10)}.csv`);
+            a.click();
+            showNotification('success', 'CSV export generated successfully.');
         }
 
-        function escapeHtml(str) {
-            return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+        function exportTableToJSON() {
+            if (allApplicants.length === 0) {
+                showNotification('error', 'No data available to export.');
+                return;
+            }
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allApplicants, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute('href', dataStr);
+            a.setAttribute('download', `Wajose_Applicants_Export_${new Date().toISOString().slice(0,10)}.json`);
+            a.click();
+            showNotification('success', 'JSON export generated successfully.');
         }
     </script>
 </body>
