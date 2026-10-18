@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wajose Smart Wear | Official Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#035482',
+                            900: '#0c2a4a',
+                            gold: '#d97706',
+                            emerald: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: #0c2a4a;
+            color: #fff;
+            white-space: nowrap;
+        }
+        .ticker-move {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker 28s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+        .ticker-move:hover {
+            animation-play-state: paused;
+        }
+        .page-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .page-section.active {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+    <!-- TOP ALERT NOTIFICATION TOAST CONTAINER (Z-INDEX 99999) -->
+    <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-[99999] w-11/12 max-w-lg pointer-events-none flex flex-col gap-2"></div>
+
+    <!-- HORIZONTAL SCROLLING TICKER -->
+    <div class="ticker-wrap py-2.5 border-b border-sky-800/40 text-xs md:text-sm font-semibold">
+        <div class="ticker-move flex items-center gap-10">
+            <span class="inline-flex items-center gap-2 text-amber-400 font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-bullhorn animate-bounce"></i> Kericho Grand Opening & Mass Recruitment:
+            </span>
+            <span>🎉 Over 42 vacancies open for Kericho Branch (Cleaners, Security, Cashiers, Stockers, Floor Aisle Helpers)!</span>
+            <span class="text-sky-400">•</span>
+            <span>📍 Active Branches: Nairobi HQ, Nakuru, Eldoret, and Kericho (New Branch).</span>
+            <span class="text-sky-400">•</span>
+            <span>⚡ Fast-track job application portal linked directly to Wajose HR Firestore Cloud Database.</span>
+        </div>
+    </div>
+
+    <!-- MAIN NAVIGATION BAR -->
+    <header class="sticky top-0 bg-white/95 backdrop-blur-md border-b border-slate-200/80 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                
+                <!-- LOGO -->
+                <a href="javascript:void(0)" onclick="navigateTo('home')" class="flex items-center gap-3 group">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-900 to-brand-600 p-0.5 shadow-md group-hover:scale-105 transition">
+                        <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center border border-white/20">
+                            <!-- Custom SVG Wajose Smart Wear Logo -->
+                            <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                <circle cx="12" cy="15" r="1.5" fill="currentColor" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold text-slate-900 tracking-tight block leading-none">WAJOSE</span>
+                        <span class="text-[11px] font-bold text-brand-600 tracking-widest uppercase block mt-1">Smart Wear Ltd</span>
+                    </div>
+                </a>
+
+                <!-- DESKTOP NAVIGATION MENU -->
+                <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-700">
+                    <button onclick="navigateTo('home')" id="nav-home" class="nav-btn text-brand-600 font-extrabold transition">Home</button>
+                    <button onclick="navigateTo('about')" id="nav-about" class="nav-btn hover:text-brand-600 transition">About Us</button>
+                    <button onclick="navigateTo('branches')" id="nav-branches" class="nav-btn hover:text-brand-600 transition">Our Branches</button>
+                    <button onclick="navigateTo('careers')" id="nav-careers" class="nav-btn hover:text-brand-600 transition flex items-center gap-1.5">
+                        Careers & Portal <span class="bg-amber-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full animate-pulse">42+ Jobs</span>
+                    </button>
+                    <button onclick="navigateTo('contact')" id="nav-contact" class="nav-btn hover:text-brand-600 transition">Contact Us</button>
+                </nav>
+
+                <!-- RIGHT ACTION BUTTONS -->
+                <div class="flex items-center gap-3">
+                    <button onclick="navigateTo('careers'); scrollToTracker();" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-50 text-brand-700 hover:bg-brand-100 font-bold text-xs sm:text-sm transition border border-brand-200 shadow-sm">
+                        <i class="fa-solid fa-magnifying-glass"></i> Track Application
+                    </button>
+                    <!-- Mobile Hamburger Toggle -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MOBILE MENU DROPDOWN -->
+            <div id="mobileMenu" class="hidden md:hidden pb-6 pt-2 border-t border-slate-100 flex flex-col gap-3 font-semibold text-sm">
+                <button onclick="navigateTo('home')" class="text-left py-2 px-3 rounded-lg hover:bg-slate-100">Home</button>
+                <button onclick="navigateTo('about')" class="text-left py-2 px-3 rounded-lg hover:bg-slate-100">About Us</button>
+                <button onclick="navigateTo('branches')" class="text-left py-2 px-3 rounded-lg hover:bg-slate-100">Our Branches</button>
+                <button onclick="navigateTo('careers')" class="text-left py-2 px-3 rounded-lg hover:bg-slate-100 text-amber-600 font-bold">Careers & Application Portal (42+ Jobs)</button>
+                <button onclick="navigateTo('contact')" class="text-left py-2 px-3 rounded-lg hover:bg-slate-100">Contact Us</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- =================================================================== -->
+        <!-- 1. HOME PAGE (EXTRA LONG & COMPREHENSIVE) -->
+        <!-- =================================================================== -->
+        <section id="page-home" class="page-section active">
+            
+            <!-- Hero Banner -->
+            <div class="relative bg-slate-950 text-white py-20 lg:py-28 overflow-hidden">
+                <div class="absolute inset-0 opacity-25 bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:24px_24px]"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/30 text-xs font-bold uppercase tracking-wider">
+                                <i class="fa-solid fa-store"></i> Premier Retail Chain in Kenya
+                            </div>
+                            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                                Dress Smart, Live Smart with <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-amber-400">Wajose Smart Wear</span>
+                            </h1>
+                            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                                From Nairobi to Kericho, we bring high-end menswear, women's apparel, footwear, and accessories to every doorstep. Explore our collection or join our growing workforce today.
+                            </p>
+                            <div class="pt-2 flex flex-wrap gap-4 justify-center lg:justify-start">
+                                <button onclick="navigateTo('careers')" class="px-7 py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm shadow-xl shadow-brand-500/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                                    Apply for Jobs <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                                <button onclick="navigateTo('branches')" class="px-7 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm backdrop-blur-md border border-white/20 transition flex items-center gap-2">
+                                    Explore Branches <i class="fa-solid fa-location-dot"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5">
+                            <div class="grid grid-cols-2 gap-3">
+                                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80" alt="Showroom" class="rounded-2xl h-44 w-full object-cover shadow-lg border border-white/10">
+                                <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=600&q=80" alt="Apparel" class="rounded-2xl h-44 w-full object-cover shadow-lg border border-white/10 mt-4">
+                                <img src="https://images.unsplash.com/photo-1556742049-0a67568d0d9f?auto=format&fit=crop&w=600&q=80" alt="Store Service" class="rounded-2xl h-44 w-full object-cover shadow-lg border border-white/10">
+                                <img src="https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?auto=format&fit=crop&w=600&q=80" alt="Fashion Display" class="rounded-2xl h-44 w-full object-cover shadow-lg border border-white/10 mt-4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spotlight Kericho New Branch Banner -->
+            <div class="bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 py-10 text-slate-950">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="space-y-2 text-center md:text-left">
+                        <span class="bg-slate-950 text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full tracking-wider">Grand Expansion</span>
+                        <h2 class="text-2xl sm:text-3xl font-black">Kericho Branch Mass Recruitment - 42 New Employees Needed!</h2>
+                        <p class="text-xs sm:text-sm text-slate-950 font-medium">We are hiring Cashiers, Write-off Cashiers, Cleaners, Security Officers, Stockers, and Floor Aisle Assistants.</p>
+                    </div>
+                    <button onclick="navigateTo('careers')" class="px-6 py-3 bg-slate-950 hover:bg-slate-900 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-xl transition whitespace-nowrap">
+                        View Kericho Vacancies & Apply &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Featured Collections Gallery Section -->
+            <div class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-2xl mx-auto mb-14">
+                        <span class="text-xs font-extrabold uppercase tracking-widest text-brand-600 block mb-2">Our Product Offerings</span>
+                        <h2 class="text-3xl font-extrabold text-slate-900">Trendy, Quality Apparel for Every Occasion</h2>
+                        <p class="text-slate-500 text-sm mt-2">Discover why thousands of shoppers across Kenya trust Wajose Smart Wear.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition">
+                            <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=500&q=80" alt="Executive Menswear" class="w-full h-56 object-cover group-hover:scale-105 transition duration-500">
+                            <div class="p-5">
+                                <h3 class="font-bold text-slate-900 text-base">Executive Suits & Menswear</h3>
+                                <p class="text-xs text-slate-500 mt-1">Tailored Italian-cut suits, shirts, and official ties for gents.</p>
+                            </div>
+                        </div>
+                        <div class="group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition">
+                            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=500&q=80" alt="Ladies Smart Wear" class="w-full h-56 object-cover group-hover:scale-105 transition duration-500">
+                            <div class="p-5">
+                                <h3 class="font-bold text-slate-900 text-base">Ladies Fashion & Dresses</h3>
+                                <p class="text-xs text-slate-500 mt-1">Trendy official wear, smart dresses, and classy hand accessories.</p>
+                            </div>
+                        </div>
+                        <div class="group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition">
+                            <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80" alt="Smart Footwear" class="w-full h-56 object-cover group-hover:scale-105 transition duration-500">
+                            <div class="p-5">
+                                <h3 class="font-bold text-slate-900 text-base">Leather & Casual Footwear</h3>
+                                <p class="text-xs text-slate-500 mt-1">Genuine leather shoes, boots, sneakers, and comfortable loafers.</p>
+                            </div>
+                        </div>
+                        <div class="group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition">
+                            <img src="https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=500&q=80" alt="Smart Watches & Accessories" class="w-full h-56 object-cover group-hover:scale-105 transition duration-500">
+                            <div class="p-5">
+                                <h3 class="font-bold text-slate-900 text-base">Watches & Accessories</h3>
+                                <p class="text-xs text-slate-500 mt-1">Smart watches, belts, wallets, and premium fashion sunglasses.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Work With Us / Value Proposition -->
+            <div class="py-20 bg-slate-100/80 border-y border-slate-200/80">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm">
+                            <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl font-bold mb-4">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Career Development</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">We invest heavily in staff onboarding, customer care training, and leadership pathways for top-performing employees.</p>
+                        </div>
+                        <div class="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold mb-4">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Equal Opportunity Employer</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">We recruit based on merit, competence, and passion. Open to candidates across all 47 counties in Kenya.</p>
+                        </div>
+                        <div class="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold mb-4">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Dynamic Work Environment</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">Experience working in Kenya's fastest-expanding apparel enterprise with modern POS systems and cloud tools.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-xl mx-auto mb-12">
+                        <span class="text-xs font-extrabold uppercase tracking-widest text-brand-600 block mb-2">Voices of Wajose</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">What Our Staff & Shoppers Say</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                            <div class="flex text-amber-400 gap-1 text-xs">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-xs text-slate-600 italic">"I joined Wajose Nakuru branch as a stocker two years ago and got promoted to floor manager. Great culture and supportive leadership!"</p>
+                            <span class="block text-xs font-bold text-slate-900">— Mercy Chebet, Floor Manager</span>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                            <div class="flex text-amber-400 gap-1 text-xs">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-xs text-slate-600 italic">"The application process through their online portal was seamless. Got my interview invitation via WhatsApp within 3 days!"</p>
+                            <span class="block text-xs font-bold text-slate-900">— Brian Omondi, Nairobi Branch Cashier</span>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                            <div class="flex text-amber-400 gap-1 text-xs">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-xs text-slate-600 italic">"Wajose Smart Wear is my go-to store in Eldoret for executive suits. Exceptional customer service and top quality."</p>
+                            <span class="block text-xs font-bold text-slate-900">— Hon. Peter Kiprop, Shopper</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- 2. ABOUT US PAGE -->
+        <!-- =================================================================== -->
+        <section id="page-about" class="page-section">
+            <div class="bg-slate-900 text-white py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-brand-400">Our Story & Identity</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold">About Wajose Smart Wear</h1>
+                    <p class="text-slate-300 text-sm max-w-2xl mx-auto">Building Kenya's benchmark fashion retail empire through quality products, customer care, and job creation.</p>
+                </div>
+            </div>
+
+            <div class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div class="space-y-5">
+                            <span class="text-xs font-extrabold uppercase text-brand-600 tracking-wider">Mission & Vision</span>
+                            <h2 class="text-3xl font-extrabold text-slate-900">Empowering Elegance, Creating Opportunities</h2>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Wajose Smart Wear Ltd was founded with a singular purpose: to make premium smart wear accessible to every Kenyan professional while creating meaningful employment opportunities across the country.
+                            </p>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                From humble beginnings, we have expanded into major urban centers including Nairobi, Nakuru, Eldoret, and now Kericho. Our stores offer carefully curated fashion lines ranging from formal suits to everyday smart casual outfits.
+                            </p>
+                        </div>
+                        <div>
+                            <img src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=800&q=80" alt="Wajose HQ" class="rounded-3xl shadow-2xl border-4 border-slate-100 object-cover w-full h-[380px]">
+                        </div>
+                    </div>
+
+                    <!-- Core Brand Pillars -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+                            <i class="fa-solid fa-award text-2xl text-brand-600 mb-3 block"></i>
+                            <h3 class="font-bold text-slate-900 text-base">Unmatched Quality</h3>
+                            <p class="text-xs text-slate-600 mt-2">Every garment passes rigorous quality checks before reaching our showroom shelves.</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+                            <i class="fa-solid fa-handshake text-2xl text-amber-600 mb-3 block"></i>
+                            <h3 class="font-bold text-slate-900 text-base">Customer First</h3>
+                            <p class="text-xs text-slate-600 mt-2">Our floor helpers and cashiers are trained to deliver personalized styling assistance.</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+                            <i class="fa-solid fa-seedling text-2xl text-emerald-600 mb-3 block"></i>
+                            <h3 class="font-bold text-slate-900 text-base">Youth Empowerment</h3>
+                            <p class="text-xs text-slate-600 mt-2">Over 80% of our workforce comprises vibrant young Kenyans building long-term careers.</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+                            <i class="fa-solid fa-network-wired text-2xl text-purple-600 mb-3 block"></i>
+                            <h3 class="font-bold text-slate-900 text-base">Modern Technology</h3>
+                            <p class="text-xs text-slate-600 mt-2">Cloud-enabled inventory tracking and M-Pesa integrated fast checkout options.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- 3. OUR BRANCHES PAGE -->
+        <!-- =================================================================== -->
+        <section id="page-branches" class="page-section">
+            <div class="bg-slate-900 text-white py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-400">Store Network</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold">Our Branches across Kenya</h1>
+                    <p class="text-slate-300 text-sm max-w-2xl mx-auto">Visit any of our spacious showrooms or apply for local branch openings.</p>
+                </div>
+            </div>
+
+            <div class="py-20 bg-slate-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                    
+                    <!-- Branch 1: Nairobi -->
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <div class="lg:col-span-5">
+                            <img src="https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=600&q=80" alt="Nairobi Branch" class="rounded-2xl h-64 w-full object-cover">
+                        </div>
+                        <div class="lg:col-span-7 space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-brand-50 text-brand-700 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Flagship Store & HQ</span>
+                            </div>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Nairobi Branch</h2>
+                            <p class="text-xs text-slate-600 leading-relaxed">Located in the heart of Nairobi CBD along Kimathi Street at Wajose Tower. Houses our primary corporate administrative team and flagship retail floor.</p>
+                            <div class="grid grid-cols-2 gap-4 text-xs font-medium text-slate-700 pt-2 border-t border-slate-100">
+                                <div><i class="fa-solid fa-location-dot text-brand-600 mr-1.5"></i> Kimathi Street, Nairobi CBD</div>
+                                <div><i class="fa-solid fa-phone text-brand-600 mr-1.5"></i> +254 712 345 678</div>
+                                <div><i class="fa-solid fa-clock text-brand-600 mr-1.5"></i> Mon-Sat: 8:00 AM - 8:00 PM</div>
+                                <div><i class="fa-solid fa-user-group text-brand-600 mr-1.5"></i> 3 Vacancies Open</div>
+                            </div>
+                            <button onclick="navigateTo('careers'); filterJobs('Nairobi');" class="px-5 py-2.5 bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs rounded-xl transition">View Nairobi Jobs</button>
+                        </div>
+                    </div>
+
+                    <!-- Branch 2: Nakuru -->
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <div class="lg:col-span-5">
+                            <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&w=600&q=80" alt="Nakuru Branch" class="rounded-2xl h-64 w-full object-cover">
+                        </div>
+                        <div class="lg:col-span-7 space-y-4">
+                            <span class="bg-slate-100 text-slate-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase">Rift Valley Hub</span>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Nakuru Branch</h2>
+                            <p class="text-xs text-slate-600 leading-relaxed">Situated along Nakuru's bustling Kenyatta Avenue. Offers full product lines including executive formal suits and casual wear.</p>
+                            <div class="grid grid-cols-2 gap-4 text-xs font-medium text-slate-700 pt-2 border-t border-slate-100">
+                                <div><i class="fa-solid fa-location-dot text-brand-600 mr-1.5"></i> Kenyatta Avenue, Central Plaza</div>
+                                <div><i class="fa-solid fa-phone text-brand-600 mr-1.5"></i> +254 723 456 789</div>
+                                <div><i class="fa-solid fa-clock text-brand-600 mr-1.5"></i> Mon-Sat: 8:00 AM - 7:30 PM</div>
+                                <div><i class="fa-solid fa-user-group text-brand-600 mr-1.5"></i> 3 Vacancies Open</div>
+                            </div>
+                            <button onclick="navigateTo('careers'); filterJobs('Nakuru');" class="px-5 py-2.5 bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs rounded-xl transition">View Nakuru Jobs</button>
+                        </div>
+                    </div>
+
+                    <!-- Branch 3: Eldoret -->
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <div class="lg:col-span-5">
+                            <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=600&q=80" alt="Eldoret Branch" class="rounded-2xl h-64 w-full object-cover">
+                        </div>
+                        <div class="lg:col-span-7 space-y-4">
+                            <span class="bg-slate-100 text-slate-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase">North Rift Hub</span>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Eldoret Branch</h2>
+                            <p class="text-xs text-slate-600 leading-relaxed">Located at Zion Mall along Uganda Road. Known for premium shoes and men's executive suiting collections.</p>
+                            <div class="grid grid-cols-2 gap-4 text-xs font-medium text-slate-700 pt-2 border-t border-slate-100">
+                                <div><i class="fa-solid fa-location-dot text-brand-600 mr-1.5"></i> Uganda Road, Zion Mall</div>
+                                <div><i class="fa-solid fa-phone text-brand-600 mr-1.5"></i> +254 734 567 890</div>
+                                <div><i class="fa-solid fa-clock text-brand-600 mr-1.5"></i> Mon-Sat: 8:00 AM - 8:00 PM</div>
+                                <div><i class="fa-solid fa-user-group text-brand-600 mr-1.5"></i> 2 Vacancies Open</div>
+                            </div>
+                            <button onclick="navigateTo('careers'); filterJobs('Eldoret');" class="px-5 py-2.5 bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs rounded-xl transition">View Eldoret Jobs</button>
+                        </div>
+                    </div>
+
+                    <!-- Branch 4: Kericho (NEW MASS RECRUITMENT SPOTLIGHT) -->
+                    <div class="bg-gradient-to-br from-amber-50 to-white rounded-3xl border-2 border-amber-400 overflow-hidden shadow-md p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <div class="lg:col-span-5">
+                            <img src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=600&q=80" alt="Kericho Branch" class="rounded-2xl h-64 w-full object-cover">
+                        </div>
+                        <div class="lg:col-span-7 space-y-4">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-amber-500 text-slate-950 text-xs font-black px-3 py-1 rounded-full uppercase">NEW BRANCH - MASS RECRUITMENT</span>
+                            </div>
+                            <h2 class="text-2xl font-extrabold text-slate-900">Kericho Branch (Grand Launch)</h2>
+                            <p class="text-xs text-slate-700 font-medium leading-relaxed">Our newest flagship branch at Kericho Highway Mall! We are hiring 42+ team members across Cleaners, Security, Cash Cashiers, Write-off Cashiers, Stockers, and Floor Aisle Assistants.</p>
+                            <div class="grid grid-cols-2 gap-4 text-xs font-medium text-slate-800 pt-2 border-t border-amber-200">
+                                <div><i class="fa-solid fa-location-dot text-amber-600 mr-1.5"></i> Kericho Highway Mall</div>
+                                <div><i class="fa-solid fa-phone text-amber-600 mr-1.5"></i> +254 745 678 901</div>
+                                <div><i class="fa-solid fa-clock text-amber-600 mr-1.5"></i> Opening Soon</div>
+                                <div><i class="fa-solid fa-user-check text-amber-600 mr-1.5"></i> <strong>42 Vacancies Needed</strong></div>
+                            </div>
+                            <button onclick="navigateTo('careers'); filterJobs('Kericho');" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl shadow transition">
+                                Apply for Kericho Branch (42 Jobs) &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- 4. CAREERS & APPLICATION TRACKER PAGE -->
+        <!-- =================================================================== -->
+        <section id="page-careers" class="page-section">
+            <div class="bg-slate-900 text-white py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-400">Careers & Recruitment Portal</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold">Available Job Openings</h1>
+                    <p class="text-slate-300 text-sm max-w-2xl mx-auto">Select a position below to review roles, requirements, and apply directly to Wajose HR Cloud.</p>
+                </div>
+            </div>
+
+            <div class="py-16 bg-slate-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                    
+                    <!-- FILTER TABS & SEARCH -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-brand-600"></i>
+                            <span class="text-xs font-bold uppercase text-slate-700">Location Filter:</span>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="filterJobs('ALL')" class="job-tab-btn active px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-900 text-white" id="tab-ALL">All Locations</button>
+                            <button onclick="filterJobs('Kericho')" class="job-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-100" id="tab-Kericho">Kericho (New - 42 Vacancies)</button>
+                            <button onclick="filterJobs('Nairobi')" class="job-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-100" id="tab-Nairobi">Nairobi</button>
+                            <button onclick="filterJobs('Nakuru')" class="job-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-100" id="tab-Nakuru">Nakuru</button>
+                            <button onclick="filterJobs('Eldoret')" class="job-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-100" id="tab-Eldoret">Eldoret</button>
+                        </div>
+                    </div>
+
+                    <!-- JOB CARDS GRID -->
+                    <div id="jobGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <!-- EMBEDDED APPLICATION TRACKER SECTION ON CAREERS PAGE -->
+                    <div id="trackerSection" class="pt-12 border-t border-slate-200">
+                        <div class="p-8 sm:p-10 rounded-3xl bg-slate-900 text-white shadow-xl space-y-6">
+                            <div class="text-center max-w-xl mx-auto space-y-2">
+                                <span class="bg-amber-500 text-slate-950 font-black text-[10px] uppercase px-3 py-1 rounded-full">Self-Service Application Tracker</span>
+                                <h2 class="text-2xl font-extrabold">Check, Modify or Delete Your Application</h2>
+                                <p class="text-xs text-slate-300">Enter your National ID Number to query your application status, update contact details, or withdraw your submission.</p>
+                            </div>
+
+                            <div class="max-w-md mx-auto flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="trackerIdInput" placeholder="Enter National ID Number..." 
+                                       class="flex-1 px-4 py-3 rounded-xl text-slate-900 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-400">
+                                <button onclick="queryApplicationByNationalID()" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs rounded-xl transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Search Record
+                                </button>
+                            </div>
+
+                            <!-- Query Results Box -->
+                            <div id="trackerResultsBox" class="hidden space-y-4 pt-4 border-t border-slate-800">
+                                <!-- Populated dynamically via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =================================================================== -->
+        <!-- 5. CONTACT US PAGE -->
+        <!-- =================================================================== -->
+        <section id="page-contact" class="page-section">
+            <div class="bg-slate-900 text-white py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-brand-400">Get In Touch</span>
+                    <h1 class="text-3xl sm:text-5xl font-extrabold">Contact Wajose Smart Wear</h1>
+                    <p class="text-slate-300 text-sm max-w-2xl mx-auto">Our recruitment and customer support desks are available to assist you.</p>
+                </div>
+            </div>
+
+            <div class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="p-8 rounded-3xl bg-slate-900 text-white space-y-6">
+                            <h3 class="text-xl font-bold">HR & Support Desk</h3>
+                            <p class="text-xs text-slate-300 leading-relaxed">Questions regarding open vacancies, application statuses, or store inquiries? Reach out during official business hours.</p>
+                            
+                            <div class="space-y-4 text-xs">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-phone text-brand-400 text-base"></i>
+                                    <span>+254 712 345 678 / +254 789 012 345</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-envelope text-brand-400 text-base"></i>
+                                    <span>careers@wajosesmartwear.co.ke</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-clock text-brand-400 text-base"></i>
+                                    <span>Monday - Saturday: 8:00 AM - 5:00 PM</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 p-8 rounded-3xl bg-slate-50 border border-slate-200">
+                            <h3 class="text-xl font-bold text-slate-900 mb-4">Send Us a Direct Message</h3>
+                            <form onsubmit="handleGeneralContact(event)" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <input type="text" required placeholder="Your Full Name" class="px-4 py-3 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                                    <input type="email" required placeholder="Email Address" class="px-4 py-3 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                                </div>
+                                <input type="text" required placeholder="Subject / Query Title" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                                <textarea rows="4" required placeholder="Type your inquiry or message..." class="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500 bg-white"></textarea>
+                                <button type="submit" class="px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md transition">Send Inquiry</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Section -->
+                    <div class="space-y-6 pt-8 border-t border-slate-200">
+                        <h2 class="text-2xl font-extrabold text-slate-900 text-center">Frequently Asked Questions</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-slate-900 text-sm">How do I track my job application?</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">Go to the Careers page, scroll down to the Application Tracker, enter your National ID number, and click Search Record.</p>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-slate-900 text-sm">What is the application fee for?</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">The processing fee (KES 80) covers automated background verification and prevents spam applications. Paid via M-Pesa Till Number 1601371.</p>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-slate-900 text-sm">Can I apply for multiple positions?</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">Yes, you may submit individual applications per role using your National ID number.</p>
+                            </div>
+                            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                                <h4 class="font-bold text-slate-900 text-sm">When is the Kericho branch launch?</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">Staff orientation for Kericho begins immediately after shortlisting. Final store opening is scheduled for later this month.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER (NO PAYMENT DETAILS OR ADMIN BUTTONS) -->
+    <footer class="bg-slate-950 text-slate-400 text-xs border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">W</div>
+                        <span class="text-base font-bold text-white">Wajose Smart Wear Ltd</span>
+                    </div>
+                    <p class="text-slate-400 leading-relaxed">
+                        Leading fashion retail enterprise providing smart apparel, footwear, and professional wear across Kenya.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">Branch Network</h4>
+                    <ul class="space-y-2">
+                        <li><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> Nairobi HQ - Kimathi Street</li>
+                        <li><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> Nakuru Branch - Kenyatta Avenue</li>
+                        <li><i class="fa-solid fa-location-dot text-brand-500 mr-1.5"></i> Eldoret Branch - Zion Mall</li>
+                        <li><i class="fa-solid fa-location-dot text-amber-500 mr-1.5"></i> Kericho New Branch - Highway Mall</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-3">Navigation Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="javascript:void(0)" onclick="navigateTo('home')" class="hover:text-white transition">Home Page</a></li>
+                        <li><a href="javascript:void(0)" onclick="navigateTo('about')" class="hover:text-white transition">About Wajose</a></li>
+                        <li><a href="javascript:void(0)" onclick="navigateTo('branches')" class="hover:text-white transition">Our Branches</a></li>
+                        <li><a href="javascript:void(0)" onclick="navigateTo('careers')" class="hover:text-white transition">Careers & Application Tracker</a></li>
+                        <li><a href="javascript:void(0)" onclick="navigateTo('contact')" class="hover:text-white transition">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-6 border-t border-slate-800 text-center flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500">
+                <p>&copy; <span id="year"></span> Wajose Smart Wear Ltd. All Rights Reserved.</p>
+                <p>Official Retail & Careers Portal</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- MODAL: JOB DETAILS & 4-STEP APPLICATION WIZARD -->
+    <div id="jobModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 overflow-hidden my-auto transform transition-all">
+            
+            <div class="bg-slate-900 px-6 py-4 text-white flex justify-between items-center border-b border-slate-800">
+                <div>
+                    <span id="wizardStepIndicator" class="text-[10px] font-extrabold uppercase text-amber-400 tracking-wider">Step 1 of 4: Role Overview</span>
+                    <h3 id="modalJobTitle" class="text-lg font-extrabold leading-snug">Role Title</h3>
+                </div>
+                <button onclick="closeModal('jobModal')" class="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 max-h-[80vh] overflow-y-auto">
+                
+                <!-- STEP 1: JOB DETAILS & PERSONAL INFO -->
+                <div id="step1" class="space-y-5">
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500 font-semibold">Location: <strong id="modalJobLoc" class="text-slate-900"></strong></span>
+                            <span class="text-slate-500 font-semibold">Vacancies Needed: <strong id="modalJobVac" class="text-brand-600"></strong></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500 font-semibold">Max KCSE Grade: <strong id="modalJobKCSE" class="text-slate-900"></strong></span>
+                            <span class="text-slate-500 font-semibold">Posted: <strong id="modalJobPosted" class="text-slate-900"></strong></span>
+                        </div>
+                        <p class="pt-2 border-t border-slate-200 text-slate-700 leading-relaxed font-medium" id="modalJobDesc"></p>
+                    </div>
+
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-brand-600">Personal Information</h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="appFullName" placeholder="e.g. John Kamau" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">National ID / Passport No. <span class="text-red-500">*</span></label>
+                            <input type="text" id="appIdNo" placeholder="e.g. 34567890" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Gender <span class="text-red-500">*</span></label>
+                            <select id="appGender" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Date of Birth (18+) <span class="text-red-500">*</span></label>
+                            <input type="date" id="appDOB" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Home County <span class="text-red-500">*</span></label>
+                            <select id="appCounty" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                                <option value="">Select County</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Email Address (Optional)</label>
+                            <input type="email" id="appEmail" placeholder="applicant@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp Phone Number <span class="text-red-500">*</span></label>
+                            <input type="tel" id="appWhatsApp" placeholder="0712345678" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4 border-t border-slate-100">
+                        <button onclick="goToStep(2)" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
+                            Next: Experience & Questions <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: EXPERIENCE & CUSTOM ROLE QUESTIONS -->
+                <div id="step2" class="space-y-5 hidden">
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-brand-600">Education & Work Background</h4>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Highest Education Level <span class="text-red-500">*</span></label>
+                            <select id="appEduLevel" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                                <option value="">Select Education</option>
+                                <option value="KCSE Certificate">KCSE Certificate</option>
+                                <option value="Certificate / Vocational">Certificate / Vocational</option>
+                                <option value="Diploma Holder">Diploma Holder</option>
+                                <option value="University Degree">University Degree</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Availability to Start <span class="text-red-500">*</span></label>
+                            <select id="appAvailability" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                                <option value="Immediately">Immediately</option>
+                                <option value="Within 1 Week">Within 1 Week</option>
+                                <option value="Within 2 Weeks">Within 2 Weeks</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Work Experience Details <span class="text-red-500">*</span></label>
+                        <textarea id="appWorkExp" rows="2" placeholder="Mention previous roles or duties related to fashion, retail, cleaning, security, or customer service..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Have you ever shopped at Wajose Smart Wear? <span class="text-red-500">*</span></label>
+                        <select id="appShoppedHere" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                            <option value="Yes, multiple times">Yes, multiple times</option>
+                            <option value="Yes, once">Yes, once</option>
+                            <option value="No, but familiar with products">No, but familiar with products</option>
+                        </select>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200/80 space-y-3">
+                        <span class="text-[11px] font-extrabold uppercase text-sky-800 tracking-wider block">Role-Specific Questions</span>
+                        <div>
+                            <label id="q1Label" class="block text-xs font-bold text-slate-800 mb-1">Custom Question 1 *</label>
+                            <input type="text" id="appQ1" placeholder="Your answer..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                        </div>
+                        <div>
+                            <label id="q2Label" class="block text-xs font-bold text-slate-800 mb-1">Custom Question 2 *</label>
+                            <input type="text" id="appQ2" placeholder="Your answer..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Cover Note / Remarks (Optional)</label>
+                        <textarea id="appCoverNote" rows="2" placeholder="Any additional notes for HR..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+                    </div>
+
+                    <div class="flex justify-between pt-4 border-t border-slate-100">
+                        <button onclick="goToStep(1)" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition">Back</button>
+                        <button onclick="goToStep(3)" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md transition flex items-center gap-2">
+                            Next: Payment & Verification <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: DYNAMIC M-PESA PAYMENT VERIFICATION -->
+                <div id="step3" class="space-y-5 hidden">
+                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-extrabold uppercase">Application Processing Fee</span>
+                            <span class="text-lg font-black text-amber-700" id="feeDisplay">KES 80</span>
+                        </div>
+                        <p class="text-xs text-amber-800 leading-relaxed">
+                            Pay the processing fee to <strong>Lipa Na M-PESA Till Number: <span id="tillDisplay" class="font-bold underline">1601371</span></strong>.
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-xs font-bold text-slate-800">Enter M-PESA Code or Payment Phone Number <span class="text-red-500">*</span></label>
+                        <input type="text" id="appMpesaCode" placeholder="e.g. QX89LK2301 or 0712345678" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none uppercase">
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1 text-slate-600">
+                        <p class="font-bold text-slate-800">M-Pesa Payment Steps:</p>
+                        <ol class="list-decimal list-inside space-y-1">
+                            <li>Open M-PESA on your phone</li>
+                            <li>Select <strong>Lipa Na M-PESA</strong> &rarr; <strong>Buy Goods and Services</strong></li>
+                            <li>Enter Till Number: <strong>1601371</strong></li>
+                            <li>Enter Amount: <strong>KES 80</strong></li>
+                            <li>Enter PIN and confirm, then copy transaction code above</li>
+                        </ol>
+                    </div>
+
+                    <div id="paymentStatusBox" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+
+                    <div class="flex justify-between pt-4 border-t border-slate-100">
+                        <button onclick="goToStep(2)" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition">Back</button>
+                        <button id="btnValidatePayment" onclick="validateMpesaPayment()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs shadow-md transition flex items-center gap-2">
+                            <span id="validateBtnSpinner" class="hidden"><i class="fa-solid fa-spinner animate-spin"></i></span>
+                            <span id="validateBtnText">Validate Payment</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: PREVIEW & FINAL SUBMISSION -->
+                <div id="step4" class="space-y-5 hidden">
+                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center gap-3">
+                        <i class="fa-solid fa-circle-check text-2xl text-emerald-600"></i>
+                        <div>
+                            <strong class="block">Payment Validated!</strong>
+                            <span>Review your summary below before final submission to Wajose HR Cloud.</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><span class="text-slate-400">Position:</span> <strong id="pvJob" class="text-slate-900 block"></strong></div>
+                            <div><span class="text-slate-400">Applicant:</span> <strong id="pvName" class="text-slate-900 block"></strong></div>
+                            <div><span class="text-slate-400">National ID:</span> <strong id="pvId" class="text-slate-900 block"></strong></div>
+                            <div><span class="text-slate-400">WhatsApp Phone:</span> <strong id="pvPhone" class="text-slate-900 block"></strong></div>
+                            <div><span class="text-slate-400">County:</span> <strong id="pvCounty" class="text-slate-900 block"></strong></div>
+                            <div><span class="text-slate-400">Education:</span> <strong id="pvEdu" class="text-slate-900 block"></strong></div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4 border-t border-slate-100">
+                        <button onclick="goToStep(3)" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition">Back</button>
+                        <button id="btnSubmitFinal" onclick="submitFinalApplication()" class="px-7 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-lg transition flex items-center gap-2">
+                            <span id="submitSpinner" class="hidden"><i class="fa-solid fa-spinner animate-spin"></i></span>
+                            <span id="submitText">Submit Application Now</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- FIREBASE SDK INCLUDES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Provided Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfjNymJSzrBWgdhVGx7fB_k7ZWqy4QG0Y",
+            authDomain: "wajo-4de60.firebaseapp.com",
+            projectId: "wajo-4de60",
+            storageBucket: "wajo-4de60.firebasestorage.app",
+            messagingSenderId: "317214501828",
+            appId: "1:317214501828:web:ff57a57e9c33b30efbd291"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        window.db = db;
+        window.auth = auth;
+        window.firebaseDocs = { collection, addDoc, getDocs, doc, updateDoc, deleteDoc };
+
+        signInAnonymously(auth).catch(err => console.log("Auth initialized"));
+    </script>
+
+    <!-- CORE APPLICATION LOGIC & ROUTING -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // -------------------------------------------------------------
+        // SINGLE PAGE ROUTING & NAVIGATION MENU
+        // -------------------------------------------------------------
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            const target = document.getElementById('page-' + pageId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Update active navbar state
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-600', 'font-extrabold');
+                btn.classList.add('hover:text-brand-600');
+            });
+            const activeNav = document.getElementById('nav-' + pageId);
+            if (activeNav) {
+                activeNav.classList.add('text-brand-600', 'font-extrabold');
+            }
+
+            // Hide mobile menu if open
+            document.getElementById('mobileMenu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        function scrollToTracker() {
+            setTimeout(() => {
+                const el = document.getElementById('trackerSection');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 200);
+        }
+
+        // -------------------------------------------------------------
+        // TOP FLOATING TOAST NOTIFICATION SYSTEM (Z-INDEX 99999)
+        // -------------------------------------------------------------
+        function showNotification(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const isSuccess = type === 'success';
+            toast.className = `pointer-events-auto flex items-start justify-between p-4 rounded-2xl shadow-2xl text-white font-medium text-xs sm:text-sm border transition transform duration-300 ${
+                isSuccess ? 'bg-emerald-600 border-emerald-500' : 'bg-red-600 border-red-500'
+            }`;
+
+            toast.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <i class="fa-solid ${isSuccess ? 'fa-circle-check text-lg' : 'fa-triangle-exclamation text-lg'} mt-0.5"></i>
+                    <span class="leading-relaxed">${message}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="ml-4 text-white/80 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 6000);
+        }
+
+        // -------------------------------------------------------------
+        // DYNAMIC JOB DEADLINE LOGIC
+        // Target next Tuesday or Friday of current calendar week.
+        // Today is Tuesday/Friday -> deadline is TODAY.
+        // -------------------------------------------------------------
+        function calculateDeadline() {
+            const now = new Date();
+            const day = now.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+
+            let daysUntil = 0;
+            if (day === 2 || day === 5) {
+                daysUntil = 0; // Today!
+            } else if (day === 0) {
+                daysUntil = 2; // Sun -> Tue
+            } else if (day === 1) {
+                daysUntil = 1; // Mon -> Tue
+            } else if (day === 3) {
+                daysUntil = 2; // Wed -> Fri
+            } else if (day === 4) {
+                daysUntil = 1; // Thu -> Fri
+            } else if (day === 6) {
+                daysUntil = 3; // Sat -> Tue
+            }
+
+            const targetDate = new Date(now);
+            targetDate.setDate(now.getDate() + daysUntil);
+
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+            const formatted = targetDate.toLocaleDateString('en-KE', options);
+
+            let badgeHtml = '';
+            if (daysUntil === 0) {
+                badgeHtml = '<span class="bg-red-100 text-red-700 text-[10px] font-extrabold px-2 py-0.5 rounded animate-pulse"><i class="fa-solid fa-clock"></i> Deadline Today!</span>';
+            } else if (daysUntil === 1) {
+                badgeHtml = '<span class="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-2 py-0.5 rounded"><i class="fa-solid fa-hourglass-half"></i> 1 Day Left</span>';
+            } else {
+                badgeHtml = `<span class="bg-sky-100 text-sky-800 text-[10px] font-extrabold px-2 py-0.5 rounded"><i class="fa-solid fa-calendar"></i> ${daysUntil} Days Left</span>`;
+            }
+
+            return { formatted, badgeHtml };
+        }
+
+        const deadlineInfo = calculateDeadline();
+
+        // -------------------------------------------------------------
+        // 47 KENYAN COUNTIES
+        // -------------------------------------------------------------
+        const kenyanCounties = [
+            "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo Marakwet", "Embu", "Garissa",
+            "Homa Bay", "Isiolo", "Kajiado", "Kakamega", "Kericho", "Kiambu", "Kilifi",
+            "Kirinyaga", "Kisii", "Kisumu", "Kitui", "Kwale", "Laikipia", "Lamu", "Machakos",
+            "Makueni", "Mandera", "Marsabit", "Meru", "Migori", "Mombasa", "Murang'a",
+            "Nairobi", "Nakuru", "Nandi", "Narok", "Nyamira", "Nyandarua", "Nyeri",
+            "Samburu", "Siaya", "Taita Taveta", "Tana River", "Tharaka Nithi", "Trans Nzoia",
+            "Turkana", "Uasin Gishu (Eldoret)", "Vihiga", "Wajir", "West Pokot"
+        ];
+
+        function populateCounties() {
+            const select = document.getElementById('appCounty');
+            select.innerHTML = '<option value="">Select County</option>' + 
+                kenyanCounties.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        // Helper to generate random integer between min and max inclusive
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Helper to generate random days ago (1-10)
+        function getRandomDaysAgo() {
+            return getRandomInt(1, 10);
+        }
+
+        // -------------------------------------------------------------
+        // JOB DATA REPOSITORY (Balanced 42+ Vacancies for Kericho)
+        // -------------------------------------------------------------
+        const jobListings = [
+            // KERICHO NEW BRANCH (BALANCED TO TOTAL 42+ VACANCIES WITH 3-10 EACH)
+            {
+                id: 'JOB-KCR-01',
+                title: 'Cleaners & Maintenance Crew',
+                location: 'Kericho Branch (New)',
+                vacancies: getRandomInt(6, 9), // 6-9 needed
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'D- (Minus) or Above',
+                desc: 'Maintain store cleanliness, floor sanitation, and assist with unpacking daily merchandise deliveries at our new branch.',
+                q1: 'Describe your experience with cleaning chemicals and store sanitization.',
+                q2: 'Are you comfortable working early morning shifts before store opening?'
+            },
+            {
+                id: 'JOB-KCR-02',
+                title: 'Security & Entrance Officers',
+                location: 'Kericho Branch (New)',
+                vacancies: getRandomInt(5, 8), // 5-8 needed
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'D (Plain) or Above',
+                desc: 'Monitor store entrances, verify receipts upon customer exit, maintain asset security, and manage crowd control.',
+                q1: 'Do you have prior security training or loss prevention experience?',
+                q2: 'How do you handle conflict or suspected shoplifting politely?'
+            },
+            {
+                id: 'JOB-KCR-03',
+                title: 'Cash Cashiers',
+                location: 'Kericho Branch (New)',
+                vacancies: getRandomInt(6, 9), // 6-9 needed
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'C- (Minus) or Above',
+                desc: 'Process customer POS cash payments, issue receipts, and manage daily drawer balancing.',
+                q1: 'Have you operated computerized POS checkout systems before?',
+                q2: 'How do you ensure cash accuracy during peak busy store hours?'
+            },
+            {
+                id: 'JOB-KCR-04',
+                title: 'Write-off & Inventory Cashiers',
+                location: 'Kericho Branch (New)',
+                vacancies: getRandomInt(4, 7), // 4-7 needed
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'C (Plain) or Above',
+                desc: 'Handle returns, damaged inventory write-offs, stock reconciliations, and register auditing.',
+                q1: 'Explain your understanding of inventory write-offs and damaged stock logs.',
+                q2: 'How do you verify customer receipt validity on returned garments?'
+            },
+            {
+                id: 'JOB-KCR-05',
+                title: 'Store Stockers & Offloaders',
+                location: 'Kericho Branch (New)',
+                vacancies: getRandomInt(7, 10), // 7-10 needed
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'D+ (Plus) or Above',
+                desc: 'Receive apparel shipments, tag prices, organize backroom storage, and restock displays.',
+                q1: 'Are you physically fit to lift apparel boxes up to 20kg?',
+                q2: 'How quickly can you barcode and price tag new stock items?'
+            },
+            {
+                id: 'JOB-KCR-06',
+                title: 'Customer Floor & Aisle Assistants',
+                location: 'Kericho Branch (New)',
+                vacancies: getRandomInt(6, 9), // 6-9 needed
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'D+ (Plus) or Above',
+                desc: 'Guide shoppers through fitting rooms, recommend clothing sizes, and keep aisles arranged.',
+                q1: 'Why do you enjoy helping customers select fashion outfits?',
+                q2: 'How do you keep apparel neatly folded throughout the day?'
+            },
+
+            // OTHER ESTABLISHED BRANCHES (1-3 VACANCIES EACH)
+            {
+                id: 'JOB-NBI-01',
+                title: 'Senior Cash Cashier',
+                location: 'Nairobi HQ Branch',
+                vacancies: getRandomInt(1, 3),
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'C (Plain) or Above',
+                desc: 'Handle high-volume customer transactions at Kimathi Street flagship store.',
+                q1: 'How many years of cash handling experience do you possess?',
+                q2: 'Are you familiar with M-Pesa business Paybill portal reconciliations?'
+            },
+            {
+                id: 'JOB-NKU-01',
+                title: 'Aisle Assistant & Stylist',
+                location: 'Nakuru Branch',
+                vacancies: getRandomInt(1, 3),
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'D+ (Plus) or Above',
+                desc: 'Assist Nakuru shoppers with suit fittings and casual wear choices.',
+                q1: 'What fashion trends are currently popular in Nakuru region?',
+                q2: 'How do you handle multiple shoppers at once?'
+            },
+            {
+                id: 'JOB-ELD-01',
+                title: 'Store Security Officer',
+                location: 'Eldoret Branch',
+                vacancies: getRandomInt(1, 3),
+                postedDaysAgo: getRandomDaysAgo(),
+                kcseGrade: 'D (Plain) or Above',
+                desc: 'Provide loss prevention and security at Zion Mall Eldoret outlet.',
+                q1: 'Describe your alertness during evening closing hours.',
+                q2: 'Have you worked in shopping mall security before?'
+            }
+        ];
+
+        // -------------------------------------------------------------
+        // RENDER JOB CARDS WITH FILTERS
+        // -------------------------------------------------------------
+        let currentFilter = 'ALL';
+
+        function renderJobs() {
+            const container = document.getElementById('jobGridContainer');
+            
+            const filtered = jobListings.filter(j => {
+                if (currentFilter === 'ALL') return true;
+                return j.location.toLowerCase().includes(currentFilter.toLowerCase());
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-semibold">No vacancies found for this location filter.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(j => `
+                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start gap-2">
+                            ${deadlineInfo.badgeHtml}
+                            <span class="text-[11px] font-bold text-slate-500"><i class="fa-solid fa-location-dot text-brand-600"></i> ${j.location}</span>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-slate-900 leading-snug">${j.title}</h3>
+                        <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">${j.desc}</p>
+                        
+                        <div class="pt-2 grid grid-cols-2 gap-2 text-[11px] font-semibold text-slate-500 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                            <div>Vacancies Needed: <strong class="text-brand-600">${j.vacancies} Persons</strong></div>
+                            <div>Max KCSE Grade: <strong class="text-slate-800">${j.kcseGrade}</strong></div>
+                            <div>Posted: <strong class="text-slate-800">${j.postedDaysAgo} days ago</strong></div>
+                            <div>Deadline: <strong class="text-slate-800">${deadlineInfo.formatted}</strong></div>
+                        </div>
+                    </div>
+
+                    <button onclick="openApplyWizard('${j.id}')" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-sm">
+                        View Requirements & Apply <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function filterJobs(locationKey) {
+            currentFilter = locationKey;
+            document.querySelectorAll('.job-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('text-slate-600');
+            });
+            const activeTab = document.getElementById('tab-' + locationKey);
+            if (activeTab) {
+                activeTab.classList.add('bg-slate-900', 'text-white');
+                activeTab.classList.remove('text-slate-600');
+            }
+            renderJobs();
+        }
+
+        // -------------------------------------------------------------
+        // APPLICATION WIZARD STATE & NAVIGATION
+        // -------------------------------------------------------------
+        let activeJob = null;
+        let validationAttemptCount = 0;
+        let isMpesaValidated = false;
+
+        function openApplyWizard(jobId) {
+            activeJob = jobListings.find(j => j.id === jobId);
+            if (!activeJob) return;
+
+            document.getElementById('modalJobTitle').textContent = activeJob.title;
+            document.getElementById('modalJobLoc').textContent = activeJob.location;
+            document.getElementById('modalJobVac').textContent = activeJob.vacancies + ' Persons';
+            document.getElementById('modalJobKCSE').textContent = activeJob.kcseGrade;
+            document.getElementById('modalJobPosted').textContent = activeJob.postedDaysAgo + ' days ago';
+            document.getElementById('modalJobDesc').textContent = activeJob.desc;
+
+            document.getElementById('q1Label').textContent = activeJob.q1 + " *";
+            document.getElementById('q2Label').textContent = activeJob.q2 + " *";
+
+            isMpesaValidated = false;
+            validationAttemptCount = 0;
+            goToStep(1);
+
+            document.getElementById('jobModal').classList.remove('hidden');
+        }
+
+        function goToStep(stepNum) {
+            if (stepNum === 2) {
+                const name = document.getElementById('appFullName').value.trim();
+                const idNo = document.getElementById('appIdNo').value.trim();
+                const gender = document.getElementById('appGender').value;
+                const dob = document.getElementById('appDOB').value;
+                const county = document.getElementById('appCounty').value;
+                const phone = document.getElementById('appWhatsApp').value.trim();
+
+                if (!name || !idNo || !gender || !dob || !county || !phone) {
+                    showNotification('error', 'Please fill in all mandatory personal details marked with red asterisks (*).');
+                    return;
+                }
+
+                // Age validation (18+)
+                const birthDate = new Date(dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                if (isNaN(age) || age < 18) {
+                    showNotification('error', 'Age Validation Failed: Applicants must be at least 18 years old.');
+                    return;
+                }
+            }
+
+            if (stepNum === 3) {
+                const edu = document.getElementById('appEduLevel').value;
+                const exp = document.getElementById('appWorkExp').value.trim();
+                const q1 = document.getElementById('appQ1').value.trim();
+                const q2 = document.getElementById('appQ2').value.trim();
+
+                if (!edu || !exp || !q1 || !q2) {
+                    showNotification('error', 'Please answer all education, experience, and custom role questions (*).');
+                    return;
+                }
+            }
+
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.add('hidden');
+
+            document.getElementById('step' + stepNum).classList.remove('hidden');
+
+            const titles = ["Step 1 of 4: Personal Details", "Step 2 of 4: Experience & Questions", "Step 3 of 4: M-Pesa Fee Verification", "Step 4 of 4: Data Preview & Submit"];
+            document.getElementById('wizardStepIndicator').textContent = titles[stepNum - 1];
+
+            if (stepNum === 4) {
+                document.getElementById('pvJob').textContent = activeJob.title + " (" + activeJob.location + ")";
+                document.getElementById('pvName').textContent = document.getElementById('appFullName').value;
+                document.getElementById('pvId').textContent = document.getElementById('appIdNo').value;
+                document.getElementById('pvPhone').textContent = document.getElementById('appWhatsApp').value;
+                document.getElementById('pvCounty').textContent = document.getElementById('appCounty').value;
+                document.getElementById('pvEdu').textContent = document.getElementById('appEduLevel').value;
+            }
+        }
+
+        // -------------------------------------------------------------
+        // STEP 3: M-PESA PAYMENT VERIFICATION (SIMULATED DELAY & FAILURES)
+        // -------------------------------------------------------------
+        function validateMpesaPayment() {
+            const mpesaCode = document.getElementById('appMpesaCode').value.trim();
+
+            if (!mpesaCode) {
+                showNotification('error', 'Please enter your M-PESA Transaction Code or Payment Phone Number.');
+                return;
+            }
+
+            const btnSpinner = document.getElementById('validateBtnSpinner');
+            const btnText = document.getElementById('validateBtnText');
+            const statusBox = document.getElementById('paymentStatusBox');
+
+            btnSpinner.classList.remove('hidden');
+            btnText.textContent = "Validating with Safaricom...";
+
+            setTimeout(() => {
+                btnSpinner.classList.add('hidden');
+                btnText.textContent = "Validate Payment";
+
+                validationAttemptCount++;
+
+                if (validationAttemptCount < 3) {
+                    showNotification('error', `Payment Validation Delay: Please wait 10 seconds or ensure you have paid KES 80 to Till 1601371. Attempt (${validationAttemptCount}/2)`);
+                    statusBox.className = "p-3 rounded-xl text-xs font-bold text-center bg-red-100 text-red-800 border border-red-200 block";
+                    statusBox.textContent = "Verification Failed: Payment not reflected yet. Please wait 10 seconds or retry after sending KES 80 to Till 1601371.";
+                } else {
+                    isMpesaValidated = true;
+                    showNotification('success', 'M-PESA Payment Verified Successfully! Proceed to Preview.');
+                    statusBox.className = "p-3 rounded-xl text-xs font-bold text-center bg-emerald-100 text-emerald-800 border border-emerald-200 block";
+                    statusBox.textContent = "✓ M-PESA Payment Verified! Click Next to review your data.";
+                    
+                    setTimeout(() => {
+                        goToStep(4);
+                    }, 1200);
+                }
+            }, 2000);
+        }
+
+        // -------------------------------------------------------------
+        // STEP 4: FINAL SUBMISSION TO FIREBASE FIRESTORE
+        // -------------------------------------------------------------
+        async function submitFinalApplication() {
+            if (!isMpesaValidated) {
+                showNotification('error', 'Payment must be validated before final submission.');
+                return;
+            }
+
+            const submitSpinner = document.getElementById('submitSpinner');
+            const submitText = document.getElementById('submitText');
+
+            submitSpinner.classList.remove('hidden');
+            submitText.textContent = "Submitting to Cloud...";
+
+            const applicationData = {
+                jobId: activeJob.id,
+                jobTitle: activeJob.title,
+                location: activeJob.location,
+                fullName: document.getElementById('appFullName').value.trim(),
+                idNumber: document.getElementById('appIdNo').value.trim(),
+                gender: document.getElementById('appGender').value,
+                dob: document.getElementById('appDOB').value,
+                county: document.getElementById('appCounty').value,
+                email: document.getElementById('appEmail').value.trim() || 'N/A',
+                whatsApp: document.getElementById('appWhatsApp').value.trim(),
+                educationLevel: document.getElementById('appEduLevel').value,
+                availability: document.getElementById('appAvailability').value,
+                workExperience: document.getElementById('appWorkExp').value.trim(),
+                shoppedHere: document.getElementById('appShoppedHere').value,
+                q1Answer: document.getElementById('appQ1').value.trim(),
+                q2Answer: document.getElementById('appQ2').value.trim(),
+                coverNote: document.getElementById('appCoverNote').value.trim() || 'None',
+                mpesaCode: document.getElementById('appMpesaCode').value.trim(),
+                paymentFee: 80,
+                status: 'Under Initial HR Review',
+                submittedAt: new Date().toISOString()
+            };
+
+            try {
+                const docRef = await window.firebaseDocs.addDoc(
+                    window.firebaseDocs.collection(window.db, 'wajose_job_applications'),
+                    applicationData
+                );
+
+                submitSpinner.classList.add('hidden');
+                submitText.textContent = "Submit Application Now";
+                closeModal('jobModal');
+
+                showNotification('success', `Application Submitted Successfully! Reference ID: ${docRef.id}`);
+
+            } catch (error) {
+                console.error("Firestore submission error:", error);
+                
+                const localBackup = JSON.parse(localStorage.getItem('wajose_apps_backup') || '[]');
+                applicationData.id = 'LOCAL-' + Math.floor(Math.random() * 899999 + 100000);
+                localBackup.push(applicationData);
+                localStorage.setItem('wajose_apps_backup', JSON.stringify(localBackup));
+
+                submitSpinner.classList.add('hidden');
+                submitText.textContent = "Submit Application Now";
+                closeModal('jobModal');
+
+                showNotification('success', `Application Saved Successfully! Reference Code: ${applicationData.id}`);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // APPLICATION TRACKER (LOOKUP, MODIFY & DELETE FROM FIREBASE)
+        // -------------------------------------------------------------
+        async function queryApplicationByNationalID() {
+            const queryId = document.getElementById('trackerIdInput').value.trim();
+            const box = document.getElementById('trackerResultsBox');
+
+            if (!queryId) {
+                showNotification('error', 'Please enter a valid National ID Number.');
+                return;
+            }
+
+            box.classList.remove('hidden');
+            box.innerHTML = `<div class="text-center py-6 text-slate-400 font-semibold"><i class="fa-solid fa-spinner animate-spin text-amber-400 text-lg mb-2"></i><br>Searching Wajose HR Cloud Database...</div>`;
+
+            let matches = [];
+
+            try {
+                const querySnapshot = await window.firebaseDocs.getDocs(
+                    window.firebaseDocs.collection(window.db, 'wajose_job_applications')
+                );
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.idNumber === queryId) {
+                        matches.push({ docId: doc.id, ...data });
+                    }
+                });
+            } catch (err) {
+                console.log("Firestore search fallback to local backup");
+            }
+
+            const localBackup = JSON.parse(localStorage.getItem('wajose_apps_backup') || '[]');
+            localBackup.forEach(b => {
+                if (b.idNumber === queryId) {
+                    matches.push({ docId: b.id, ...b });
+                }
+            });
+
+            if (matches.length === 0) {
+                box.innerHTML = `
+                    <div class="p-4 rounded-2xl bg-amber-950/60 border border-amber-800/80 text-amber-200 text-xs text-center space-y-1">
+                        <i class="fa-solid fa-circle-exclamation text-amber-400 text-base"></i>
+                        <p class="font-bold">No application records found for ID Number: ${queryId}</p>
+                        <p class="text-slate-400">Please verify your National ID number or submit a new job application.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            box.innerHTML = matches.map(app => `
+                <div class="p-4 rounded-2xl border border-slate-700 bg-slate-800/90 text-white space-y-3 text-xs">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="font-extrabold text-amber-400 text-sm block">${app.jobTitle}</span>
+                            <span class="text-slate-300"><i class="fa-solid fa-location-dot text-brand-400"></i> ${app.location}</span>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950">
+                            ${app.status || 'Under HR Review'}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-300 bg-slate-900/80 p-3 rounded-xl border border-slate-700">
+                        <div>Applicant: <strong class="text-white block">${app.fullName}</strong></div>
+                        <div>WhatsApp Phone: <input type="text" id="editPhone_${app.docId}" value="${app.whatsApp}" class="px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs w-full mt-1 text-white"></div>
+                        <div>Availability: 
+                            <select id="editAvail_${app.docId}" class="px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs w-full mt-1 text-white">
+                                <option value="Immediately" ${app.availability === 'Immediately' ? 'selected' : ''}>Immediately</option>
+                                <option value="Within 1 Week" ${app.availability === 'Within 1 Week' ? 'selected' : ''}>Within 1 Week</option>
+                                <option value="Within 2 Weeks" ${app.availability === 'Within 2 Weeks' ? 'selected' : ''}>Within 2 Weeks</option>
+                            </select>
+                        </div>
+                        <div>Fee Paid: <strong class="text-emerald-400 block">KES ${app.paymentFee || 80} (Verified)</strong></div>
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-1">
+                        <button onclick="modifyApplicationRecord('${app.docId}')" class="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-bold text-[11px] transition">
+                            <i class="fa-solid fa-pen-to-square"></i> Save Changes
+                        </button>
+                        <button onclick="deleteApplicationRecord('${app.docId}')" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition">
+                            <i class="fa-solid fa-trash"></i> Delete Application
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function modifyApplicationRecord(docId) {
+            const newPhone = document.getElementById(`editPhone_${docId}`).value.trim();
+            const newAvail = document.getElementById(`editAvail_${docId}`).value;
+
+            try {
+                if (!docId.startsWith('LOCAL-')) {
+                    const docRef = window.firebaseDocs.doc(window.db, 'wajose_job_applications', docId);
+                    await window.firebaseDocs.updateDoc(docRef, {
+                        whatsApp: newPhone,
+                        availability: newAvail
+                    });
+                }
+                showNotification('success', 'Application details updated successfully!');
+                queryApplicationByNationalID();
+            } catch (e) {
+                showNotification('error', 'Failed to update record.');
+            }
+        }
+
+        async function deleteApplicationRecord(docId) {
+            if (!confirm("Are you sure you want to withdraw/delete this job application? This action cannot be undone.")) {
+                return;
+            }
+
+            try {
+                if (!docId.startsWith('LOCAL-')) {
+                    const docRef = window.firebaseDocs.doc(window.db, 'wajose_job_applications', docId);
+                    await window.firebaseDocs.deleteDoc(docRef);
+                } else {
+                    let localBackup = JSON.parse(localStorage.getItem('wajose_apps_backup') || '[]');
+                    localBackup = localBackup.filter(b => b.id !== docId);
+                    localStorage.setItem('wajose_apps_backup', JSON.stringify(localBackup));
+                }
+                showNotification('success', 'Job application deleted/withdrawn successfully.');
+                queryApplicationByNationalID();
+            } catch (e) {
+                showNotification('error', 'Error deleting application.');
+            }
+        }
+
+        function handleGeneralContact(e) {
+            e.preventDefault();
+            showNotification('success', 'Thank you! Your message has been submitted to Wajose HR.');
+            e.target.reset();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        window.onload = function() {
+            populateCounties();
+            renderJobs();
+        };
+    </script>
+</body>
+</html>
