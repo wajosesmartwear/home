@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-slate-50">
+<html lang="en" class="h-full bg-slate-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,26 +27,26 @@
     </script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
+    <!-- Chart.js for Dashboards -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="h-full text-slate-800 antialiased font-sans">
 
-    <!-- TOP TOAST MESSAGES -->
+    <!-- TOP TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 w-full max-w-md px-4 pointer-events-none"></div>
 
     <!-- LOGIN LOCK SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-95 backdrop-blur-md">
         <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border border-slate-100 text-center">
             <div class="w-16 h-16 bg-rose-100 text-brand-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
-                <i class="fa-solid fa-lock"></i>
+                <i class="fa-solid fa-shield-halved"></i>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-1">Admin Access Lock</h2>
-            <p class="text-sm text-slate-500 mb-6">Enter the master PIN code to manage Wajose Smart Wear applicants and cloud settings.</p>
+            <h2 class="text-2xl font-bold text-slate-900 mb-1">Wajose Admin Portal</h2>
+            <p class="text-sm text-slate-500 mb-6">Enter your master passcode to manage applicants and real-time cloud settings.</p>
             
             <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <input type="password" id="pin-input" placeholder="Enter PIN (Default: 115800)" maxlength="10" required 
+                    <input type="password" id="pin-input" placeholder="Enter PIN (Default: 115800)" maxlength="12" required 
                            class="w-full text-center text-2xl tracking-widest px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-600 focus:outline-none font-mono">
                 </div>
                 <button type="submit" id="login-btn" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-rose-600/30 transition-all flex items-center justify-center gap-2">
@@ -54,7 +54,7 @@
                     <i class="fa-solid fa-arrow-right text-sm"></i>
                 </button>
             </form>
-            <p class="text-xs text-slate-400 mt-6">Default Master PIN: <span class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600">115800</span></p>
+            <p class="text-xs text-slate-400 mt-6">Default PIN: <span class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600">115800</span></p>
         </div>
     </div>
 
@@ -70,19 +70,20 @@
                     <div>
                         <h1 class="font-bold text-base tracking-wide text-white leading-tight">Wajose Smart Wear</h1>
                         <p class="text-xs text-slate-400 flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Admin Operations Portal
+                            <span id="connection-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            <span id="connection-text">Connecting to Firebase...</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-4">
-                    <span id="sync-status" class="hidden md:flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800/50 px-3 py-1 rounded-full">
-                        <i class="fa-solid fa-cloud text-[10px]"></i> Cloud Firestore Connected
-                    </span>
+                <div class="flex items-center gap-3">
+                    <button onclick="refreshData()" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span class="hidden sm:inline">Sync Data</span>
+                    </button>
                     <button onclick="lockPortal()" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 transition flex items-center gap-1.5">
                         <i class="fa-solid fa-lock text-xs"></i>
-                        <span>Lock Portal</span>
+                        <span>Lock</span>
                     </button>
                 </div>
             </div>
@@ -93,14 +94,14 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <nav class="flex gap-6 overflow-x-auto text-sm font-medium text-slate-600 no-scrollbar">
                     <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-3.5 border-b-2 border-brand-600 text-brand-600 font-semibold flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-chart-pie"></i> Analytics & Dashboard
+                        <i class="fa-solid fa-chart-pie"></i> Overview & Analytics
                     </button>
                     <button onclick="switchTab('applicants')" id="tab-applicants" class="py-3.5 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
                         <i class="fa-solid fa-users"></i> Applicant Records
-                        <span id="badge-applicant-count" class="bg-slate-100 text-slate-600 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                        <span id="badge-applicant-count" class="bg-slate-100 text-slate-600 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
                     </button>
                     <button onclick="switchTab('settings')" id="tab-settings" class="py-3.5 border-b-2 border-transparent hover:text-slate-900 flex items-center gap-2 whitespace-nowrap">
-                        <i class="fa-solid fa-sliders"></i> Payment & System Settings
+                        <i class="fa-solid fa-sliders"></i> Payment & Cloud Settings
                     </button>
                 </nav>
             </div>
@@ -116,7 +117,7 @@
                         <div>
                             <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Applications</p>
                             <h3 id="stat-total" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                            <p class="text-xs text-slate-500 mt-1">All branch submissions</p>
+                            <p class="text-xs text-slate-500 mt-1">Live from cloud database</p>
                         </div>
                         <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
                             <i class="fa-solid fa-folder-open"></i>
@@ -127,7 +128,7 @@
                         <div>
                             <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Pending Review</p>
                             <h3 id="stat-pending" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                            <p class="text-xs text-amber-600 font-medium mt-1">Requires action</p>
+                            <p class="text-xs text-amber-600 font-medium mt-1">Awaiting evaluation</p>
                         </div>
                         <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
                             <i class="fa-solid fa-hourglass-half"></i>
@@ -147,9 +148,9 @@
 
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-semibold text-rose-600 uppercase tracking-wider">M-Pesa Collections</p>
+                            <p class="text-xs font-semibold text-rose-600 uppercase tracking-wider">M-Pesa Revenue</p>
                             <h3 id="stat-revenue" class="text-3xl font-extrabold text-slate-900 mt-1">KES 0</h3>
-                            <p class="text-xs text-slate-500 mt-1">Verified fee payments</p>
+                            <p class="text-xs text-slate-500 mt-1">Application fees collected</p>
                         </div>
                         <div class="w-12 h-12 bg-rose-50 text-brand-600 rounded-xl flex items-center justify-center text-xl">
                             <i class="fa-solid fa-money-bill-wave"></i>
@@ -157,8 +158,8 @@
                     </div>
                 </div>
 
-                <!-- KERICHO MASS RECRUITMENT PROGRESS -->
-                <div class="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl border border-rose-900/30">
+                <!-- KERICHO RECRUITMENT PROGRESS -->
+                <div class="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl border border-rose-900/35">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div class="space-y-2">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold">
@@ -166,12 +167,12 @@
                             </span>
                             <h3 class="text-2xl font-bold text-white">Kericho Branch Recruitment Tracker</h3>
                             <p class="text-slate-300 text-sm max-w-2xl">
-                                Monitoring for the Kericho branch grand opening recruitment quota.
+                                Real-time applicant volume tracking for the upcoming Kericho branch grand opening.
                             </p>
                         </div>
 
                         <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 min-w-[220px] text-center">
-                            <p class="text-xs text-slate-300 uppercase tracking-wider">Kericho Applications Received</p>
+                            <p class="text-xs text-slate-300 uppercase tracking-wider">Kericho Submissions</p>
                             <div class="text-3xl font-extrabold text-white mt-1" id="kericho-count-display">0 / 42 Target</div>
                             <div class="w-full bg-slate-700 h-2.5 rounded-full mt-3 overflow-hidden">
                                 <div id="kericho-progress-bar" class="bg-brand-500 h-full transition-all duration-500" style="width: 0%"></div>
@@ -180,7 +181,7 @@
                     </div>
                 </div>
 
-                <!-- ANALYTICS CHARTS SECTION -->
+                <!-- CHARTS -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
@@ -193,7 +194,7 @@
 
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h4 class="font-bold text-slate-800 text-base mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-briefcase text-brand-600"></i> Applications by Role
+                            <i class="fa-solid fa-briefcase text-brand-600"></i> Applications by Job Role
                         </h4>
                         <div class="h-64 relative flex items-center justify-center">
                             <canvas id="jobCategoryChart"></canvas>
@@ -202,19 +203,19 @@
                 </div>
             </section>
 
-            <!-- TAB 2: APPLICANT MANAGEMENT TABLE -->
+            <!-- TAB 2: APPLICANT TABLE -->
             <section id="view-applicants" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
                         <div class="relative w-full md:w-96">
                             <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="filter-search" oninput="applyApplicantFilters()" placeholder="Search Name, ID Number, Phone or M-Pesa Code..." 
+                            <input type="text" id="filter-search" oninput="applyApplicantFilters()" placeholder="Search Name, ID Number, Phone, M-Pesa..." 
                                    class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-600">
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                        <div class="flex items-center gap-3 w-full md:w-auto justify-end">
                             <button onclick="exportApplicantsCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-md flex items-center gap-2 transition">
-                                <i class="fa-solid fa-file-excel"></i> Export to CSV
+                                <i class="fa-solid fa-file-excel"></i> Export CSV
                             </button>
                         </div>
                     </div>
@@ -223,7 +224,7 @@
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                         <div>
-                            <label class="block font-medium text-slate-600 mb-1">Filter Location</label>
+                            <label class="block font-medium text-slate-600 mb-1">Branch</label>
                             <select id="filter-location" onchange="applyApplicantFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
                                 <option value="ALL">All Branches</option>
                                 <option value="Kericho">Kericho</option>
@@ -234,7 +235,7 @@
                         </div>
 
                         <div>
-                            <label class="block font-medium text-slate-600 mb-1">Filter Status</label>
+                            <label class="block font-medium text-slate-600 mb-1">Status</label>
                             <select id="filter-status" onchange="applyApplicantFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none">
                                 <option value="ALL">All Statuses</option>
                                 <option value="Submitted">Submitted / Under Review</option>
@@ -257,15 +258,14 @@
                         </div>
 
                         <div>
-                            <label class="block font-medium text-slate-600 mb-1">Reset Filters</label>
+                            <label class="block font-medium text-slate-600 mb-1">Reset</label>
                             <button onclick="resetFilters()" class="w-full p-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition text-center">
-                                Clear Filters
+                                Clear
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- TABLE CONTAINING APPLICANTS -->
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm text-slate-600">
@@ -292,7 +292,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: CLOUD SETTINGS & PAYMENT CONTROL -->
+            <!-- TAB 3: SETTINGS -->
             <section id="view-settings" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
@@ -302,19 +302,19 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-slate-900 text-base">Live M-Pesa Fee Control</h3>
-                                <p class="text-xs text-slate-500">Updates live on website</p>
+                                <p class="text-xs text-slate-500">Synced live to applicant portal</p>
                             </div>
                         </div>
 
                         <form id="payment-settings-form" onsubmit="savePaymentSettings(event)" class="space-y-4 pt-2">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Application Processing Fee (KES)</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Application Fee (KES)</label>
                                 <input type="number" id="setting-app-fee" value="80" min="0" required 
                                        class="w-full p-2.5 border border-slate-300 rounded-xl font-bold text-slate-800 focus:ring-2 focus:ring-brand-600">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">M-Pesa Till or Paybill Number</label>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">M-Pesa Till / Paybill Number</label>
                                 <input type="text" id="setting-till-number" value="1601371" required 
                                        class="w-full p-2.5 border border-slate-300 rounded-xl font-mono text-slate-800 focus:ring-2 focus:ring-brand-600">
                             </div>
@@ -332,7 +332,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-slate-900 text-base">Admin Security Passcode</h3>
-                                <p class="text-xs text-slate-500">Update master PIN code</p>
+                                <p class="text-xs text-slate-500">Update master PIN stored in cloud</p>
                             </div>
                         </div>
 
@@ -385,7 +385,7 @@
         </div>
     </div>
 
-    <!-- FIREBASE SDKs -->
+    <!-- FIREBASE SDKs & CONTROLLER SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -408,6 +408,7 @@
         let masterPin = "115800";
         let branchChartInstance = null;
         let jobCategoryChartInstance = null;
+        let unsubscribeApplicants = null;
 
         async function fetchAdminConfig() {
             try {
@@ -415,9 +416,11 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().pin) {
                     masterPin = docSnap.data().pin;
+                } else {
+                    await setDoc(docRef, { pin: "115800" }, { merge: true });
                 }
             } catch(e) {
-                console.warn("Using default PIN", e);
+                console.warn("Using fallback PIN", e);
             }
         }
         fetchAdminConfig();
@@ -435,32 +438,46 @@
                     document.getElementById('login-screen').classList.add('hidden');
                     document.getElementById('admin-app').classList.remove('hidden');
                     showToast("Portal Unlocked Successfully!", "success");
-                    listenToApplicantsCloud();
+                    startLiveSync();
                     loadPaymentSettingsUI();
                 } else {
                     showToast("Incorrect Master PIN! Try again.", "error");
                     btn.innerHTML = `<span>Unlock Dashboard</span><i class="fa-solid fa-arrow-right text-sm"></i>`;
                 }
-            }, 600);
+            }, 500);
         };
 
         window.lockPortal = function() {
             document.getElementById('admin-app').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('pin-input').value = '';
+            if (unsubscribeApplicants) unsubscribeApplicants();
             showToast("Admin Portal Locked", "info");
         };
 
-        // Flexible Listener with Fallbacks
-        function listenToApplicantsCloud() {
+        window.refreshData = function() {
+            showToast("Syncing data from Cloud...", "info");
+            startLiveSync();
+        };
+
+        // Real-Time Firebase Firestore Synchronization
+        function startLiveSync() {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-text');
+            
+            dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+            text.innerText = "Firestore Live Synced";
+
             const q = collection(db, "applications");
-            onSnapshot(q, (snapshot) => {
+            if (unsubscribeApplicants) unsubscribeApplicants();
+
+            unsubscribeApplicants = onSnapshot(q, (snapshot) => {
                 allApplicants = [];
                 snapshot.forEach((docSnap) => {
                     const raw = docSnap.data();
                     allApplicants.push({
                         id: docSnap.id,
-                        fullName: raw.fullName || raw.name || raw.applicantName || 'Anonymous',
+                        fullName: raw.fullName || raw.name || raw.applicantName || 'Anonymous Candidate',
                         idNumber: raw.idNumber || raw.nationalId || raw.id || 'N/A',
                         jobTitle: raw.jobTitle || raw.title || raw.role || 'General Staff',
                         jobLocation: raw.jobLocation || raw.location || raw.branch || 'Kericho',
@@ -481,8 +498,10 @@
                 applyApplicantFilters();
                 updateDashboardStats();
             }, (error) => {
-                console.error("Firestore Error:", error);
-                showToast("Error connecting to database", "error");
+                console.error("Firestore Listen Error:", error);
+                dot.className = "w-2 h-2 rounded-full bg-rose-500";
+                text.innerText = "Connection Error (Check Rules)";
+                showToast("Failed to fetch applications from cloud", "error");
             });
         }
 
@@ -613,11 +632,11 @@
                     </td>
                     <td class="p-4">
                         <div class="font-semibold text-slate-800">${escapeHtml(app.jobTitle)}</div>
-                        <div class="text-xs text-rose-600 font-medium">${escapeHtml(app.jobLocation)}</div>
+                        <div class="text-xs text-rose-600 font-medium">${escapeHtml(app.jobLocation)} Branch</div>
                     </td>
                     <td class="p-4 text-xs">
                         <div><i class="fa-solid fa-phone text-slate-400 mr-1"></i> ${escapeHtml(app.whatsapp)}</div>
-                        <div class="text-slate-400"><i class="fa-solid fa-map-pin text-slate-400 mr-1"></i> ${escapeHtml(app.county)}</div>
+                        <div class="text-slate-400"><i class="fa-solid fa-map-pin text-slate-400 mr-1"></i> ${escapeHtml(app.county)} County</div>
                     </td>
                     <td class="p-4 text-xs font-mono">
                         <span class="bg-slate-100 px-2 py-1 rounded text-slate-700 font-bold">${escapeHtml(app.mpesaCode)}</span>
@@ -625,10 +644,10 @@
                     </td>
                     <td class="p-4">${statusBadge}</td>
                     <td class="p-4 text-right space-x-2">
-                        <button onclick="viewApplicantDetails('${app.id}')" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
-                            <i class="fa-solid fa-eye"></i> View
+                        <button onclick="viewApplicantDetails('${app.id}')" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition" title="View Profile">
+                            <i class="fa-solid fa-eye"></i>
                         </button>
-                        <button onclick="quickDeleteApplicant('${app.id}')" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold transition">
+                        <button onclick="quickDeleteApplicant('${app.id}')" class="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-semibold transition" title="Delete">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -657,13 +676,27 @@
                         <span class="font-bold text-slate-800">${escapeHtml(app.gender)} (${escapeHtml(app.dob)})</span>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 block">WhatsApp / Phone</span>
+                        <span class="text-xs text-slate-400 block">WhatsApp Phone</span>
                         <span class="font-bold text-slate-800">${escapeHtml(app.whatsapp)}</span>
                     </div>
                     <div>
                         <span class="text-xs text-slate-400 block">County</span>
                         <span class="font-bold text-slate-800">${escapeHtml(app.county)}</span>
                     </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">Education Level</span>
+                        <span class="font-bold text-slate-800">${escapeHtml(app.education)}</span>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 block">M-Pesa Reference</span>
+                        <span class="font-bold text-emerald-700 font-mono">${escapeHtml(app.mpesaCode)}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 bg-white p-4 rounded-xl border border-slate-200">
+                    <h4 class="font-bold text-xs uppercase text-slate-500">Custom Role Responses</h4>
+                    <p class="text-xs"><strong>Q1:</strong> ${escapeHtml(app.q1_answer)}</p>
+                    <p class="text-xs"><strong>Q2:</strong> ${escapeHtml(app.q2_answer)}</p>
                 </div>
 
                 <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl">
@@ -707,12 +740,12 @@
         };
 
         window.quickDeleteApplicant = async function(id) {
-            if (!confirm("Are you sure you want to delete this job application?")) return;
+            if (!confirm("Are you sure you want to permanently delete this application?")) return;
             try {
                 await deleteDoc(doc(db, "applications", id));
                 showToast("Application deleted", "info");
             } catch(e) {
-                showToast("Failed to delete application", "error");
+                showToast("Failed to delete", "error");
             }
         };
 
@@ -760,14 +793,14 @@
             const confirmPin = document.getElementById('setting-confirm-pin').value.trim();
 
             if (newPin !== confirmPin) {
-                showToast("PINs do not match!", "error");
+                showToast("PIN passwords do not match!", "error");
                 return;
             }
 
             try {
                 await setDoc(doc(db, "settings", "admin_config"), { pin: newPin }, { merge: true });
                 masterPin = newPin;
-                showToast("Master PIN updated!", "success");
+                showToast("Master PIN updated successfully!", "success");
                 document.getElementById('pin-change-form').reset();
             } catch(e) {
                 showToast("Failed to change PIN", "error");
@@ -780,18 +813,19 @@
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,ID,Name,Role,Location,Phone,Status\n";
+            let csvContent = "data:text/csv;charset=utf-8,ID Number,Full Name,Role,Branch,Phone,Status,M-Pesa Code\n";
             filteredApplicants.forEach(a => {
-                csvContent += `"${a.idNumber}","${a.fullName}","${a.jobTitle}","${a.jobLocation}","${a.whatsapp}","${a.status}"\n`;
+                csvContent += `"${a.idNumber}","${a.fullName}","${a.jobTitle}","${a.jobLocation}","${a.whatsapp}","${a.status}","${a.mpesaCode}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "applicants.csv");
+            link.setAttribute("download", `wajose_applicants_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            showToast("CSV Export generated successfully!", "success");
         };
 
         window.switchTab = function(tabName) {
